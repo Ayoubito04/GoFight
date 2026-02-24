@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ejercicios {
+  id_ejercicio       Int                  @id @default(autoincrement())
+  nombre             String               @db.VarChar(150)
+  categoria          categoria?
+  url_video          String?
+  rutinas_ejercicios rutinas_ejercicios[]
+}
+
+model gamificaciones {
+  id_gamificacion Int       @id @default(autoincrement())
+  id_usuario      Int?
+  racha_dias      Int?      @default(0)
+  puntos_ranking  Int?      @default(0)
+  usuarios        usuarios? @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model rutinas {
+  id_rutina          Int                  @id @default(autoincrement())
+  nombre_rutina      String               @db.VarChar(150)
+  dificultad         dificultad?
+  rutinas_ejercicios rutinas_ejercicios[]
+  sesiones_historial sesiones_historial[]
+}
+
+model rutinas_ejercicios {
+  id_rutina_ejercicio Int         @id @default(autoincrement())
+  id_rutina           Int?
+  id_ejercicios       Int?
+  duracion_ejercicio  Int?
+  duracion_descanso   Int?
+  orden               Int?
+  ejercicios          ejercicios? @relation(fields: [id_ejercicios], references: [id_ejercicio], onDelete: Cascade, onUpdate: NoAction)
+  rutinas             rutinas?    @relation(fields: [id_rutina], references: [id_rutina], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model sesiones_historial {
+  id_sesion_historial Int       @id @default(autoincrement())
+  id_usuario          Int?
+  id_rutinas          Int?
+  fecha_entreno       DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
+  calorias            Decimal?  @db.Decimal(8, 2)
+  rutinas             rutinas?  @relation(fields: [id_rutinas], references: [id_rutina], onDelete: Cascade, onUpdate: NoAction)
+  usuarios            usuarios? @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model usuarios {
+  id_usuario         Int                  @id @default(autoincrement())
+  nombre             String               @db.VarChar(150)
+  email              String               @unique @db.VarChar(200)
+  contrasena         String               @db.VarChar(255)
+  perfil             String?
+  gamificaciones     gamificaciones[]
+  sesiones_historial sesiones_historial[]
+}
+
+enum categoria {
+  Saco
+  Pera
+  Manoplas
+  Cardio
+  Comba
+}
+
+enum dificultad {
+  F_cil      @map("Fácil")
+  Intermedio
+  Avanzado
+}
