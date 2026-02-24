@@ -4,9 +4,12 @@ const express =require('express');
 const cors=require('cors');//Definimos el cors,que va a ser como nuestro portero de seguridad,para nuestro servidor
 //Ahora vamos a traer la base de datos,que la tenemos definida en el archivo db.js
 const prisma=require('./src/db/db');//Traemos la base de datos,que tenemos definiada en el archivo
+const UsuariosRoutes=require('./src/routes/UsuariosRoutes');//Traemos las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js
 require('dotenv').config();//Para poder usar las variables de entorno,que las tenemos definidas en el archivo .env
 const app=express();
 app.use(express.json());//Le decimos a express que vamos a usar json,para poder enviar y recibir datos en formato json
+app.use(express.urlencoded({extended:true}));//Le decimos a express que vamos a usar urlencoded,para poder enviar y recibir datos en formato urlencoded
+
 
 app.use(cors());
 async function ConectionDB(){
@@ -20,6 +23,7 @@ async function ConectionDB(){
     }
 }
 ConectionDB();
+app.use('/api/auth',UsuariosRoutes);//Le decimos a express que vamos a usar las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js, y que van a estar disponibles en la ruta /api/auth
 //Ahora vvamos a escuchar el puerto,que lo tenemos definido en la variable de entorno
 const PORT=process.env.RUTA || 3000;
 app.listen(PORT,()=>{
