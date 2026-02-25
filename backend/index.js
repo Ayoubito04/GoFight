@@ -24,6 +24,8 @@ async function ConectionDB(){
 }
 ConectionDB();
 app.use('/api/auth',UsuariosRoutes);//Le decimos a express que vamos a usar las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js, y que van a estar disponibles en la ruta /api/auth
+app.use('/api/auth',UsuariosRoutes);//Le decimos a express que vamos a usar las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js, y que van a estar disponibles en la ruta /api/usuarios
+
 //Ahora vvamos a escuchar el puerto,que lo tenemos definido en la variable de entorno
 const PORT=process.env.RUTA || 3000;
 app.listen(PORT,()=>{
