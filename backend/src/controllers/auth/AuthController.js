@@ -45,7 +45,7 @@ const login=async(req,res)=>{
             return res.status(401).json({message:'Contraseña incorrecta'});
             //Indicamos que la contraseña es incorrecta,en el caso de que lo sea
         }
-        const token=generarToken(user.id_usuario,user.email);//Generamos el token con estos parametros
+        const token=generarToken(user.id_usuario,user.email,user.rol);//Generamos el token con estos parametros
         //Una vez que tengamos el token creado,lo vamos a enviar al cliente para que lo pueda usar en las siguientes peticiones
          res.status(200).json({message:'Inicio de sesión exitoso',token});//Una vez que el usuario se haya logeado le aparecerá el token desde Insomnia
 
