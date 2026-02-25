@@ -12,7 +12,8 @@ const registro=async(req,res)=>{
             data:{
                 nombre:name,
                 email:email,
-                contrasena:hashPassword
+                contrasena:hashPassword,
+                rol:'user'
             }
         })
         res.status(201).json({message:'Usuario registrado exitosamente',user});
@@ -47,7 +48,7 @@ const login=async(req,res)=>{
         const token=generarToken(user.id_usuario,user.email);//Generamos el token con estos parametros
         //Una vez que tengamos el token creado,lo vamos a enviar al cliente para que lo pueda usar en las siguientes peticiones
          res.status(200).json({message:'Inicio de sesión exitoso',token});//Una vez que el usuario se haya logeado le aparecerá el token desde Insomnia
-         
+
     }catch(error){
         res.status(500).json({message:'Error al iniciar sesión',error:error.message});
     }

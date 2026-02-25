@@ -19,9 +19,10 @@ const getUsuario=async(req,res)=>{
 
 }
 const EliminarUsuario=async(req,res)=>{
+    const id=req.user.id;
     try{
         const EliminarUsuario=await prisma.usuarios.delete({
-            where:{id_usuario:req.user.id_usuario}//Ponemos la condición,es decir buscará al usuario por su id
+            where:{id_usuario:id}//Ponemos la condición,es decir buscará al usuario por su id
         })
         if(!EliminarUsuario){
             return res.status(404).json({message:'Usuario no encontrado,compruebe que exista'});
@@ -36,8 +37,9 @@ const EliminarUsuario=async(req,res)=>{
 const ActualizarUsuario=async(req,res)=>{
     //Vamos con la función de actualizar usuarios
     try{
+        const id=req.user.id
         const ActualizarUsuario=await prisma.usuarios.update({
-            where:{id_usuario:req.user.id_usuario},//Ponemos la condición,es decir buscará al usuario por su id
+            where:{id_usuario:id},//Ponemos la condición,es decir buscará al usuario por su id
             data:{...req.body}//Actualizamos los datos del usuario,con los datos que recibimos desde el cliente
         })
         res.status(200).json({message:'Usuario actualizado exitosamente',ActualizarUsuario});
