@@ -12,7 +12,7 @@ const storage=new CloudinaryStorage({
     cloudinary:cloudinary,
     params:{
         folder:'GoFight_App',
-        allowed_formats:['jpg','png','jpeg'],
+        allowed_formats:['jpg','png','jpeg','mp4','mov','avi'],
         transformation:[{width:500,height:500,crop:'limit'}]
     }
 })

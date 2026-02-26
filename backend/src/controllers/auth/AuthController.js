@@ -9,6 +9,7 @@ const registro=async(req,res)=>{
      if(!perfil){
         perfil='https://images.unsplash.com/vector-1767626090408-a23fae603963?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
      }
+
      const salt=await bcrypt.genSalt(10);//Generamos un salt para ocultar la contraseña
      const hashPassword=await bcrypt.hash(password,salt);//Encriptamos la contraseña con el salt
      try{
@@ -18,7 +19,17 @@ const registro=async(req,res)=>{
                 email:email,
                 contrasena:hashPassword,
                 rol:'user',
-                perfil:perfil
+                perfil:perfil,
+                gamificaciones:{
+                     create:{
+                        racha_dias:0,
+                        puntos_ranking:0
+                     }
+                },
+               
+                
+            },
+            include:{gamificaciones:true
             }
         })
         res.status(201).json({message:'Usuario registrado exitosamente',user});

@@ -26,8 +26,10 @@ model gamificaciones {
 
 model rutinas {
   id_rutina          Int                  @id @default(autoincrement())
+  id_usuario         Int?
   nombre_rutina      String               @db.VarChar(150)
   dificultad         dificultad?
+  usuarios           usuarios?   @relation(fields:[id_usuario],references:[id_usuario],onDelete:Cascade,onUpdate:NoAction)
   rutinas_ejercicios rutinas_ejercicios[]
   sesiones_historial sesiones_historial[]
 }
@@ -65,6 +67,7 @@ model usuarios {
   perfil             String?
   gamificaciones     gamificaciones[]
   sesiones_historial sesiones_historial[]
+  rutinas            rutinas[]
 }
 
 enum categoria {
