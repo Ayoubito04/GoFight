@@ -6,7 +6,9 @@ const cors=require('cors');//Definimos el cors,que va a ser como nuestro portero
 const prisma=require('./src/db/db');//Traemos la base de datos,que tenemos definiada en el archivo
 const UsuariosRoutes=require('./src/routes/UsuariosRoutes');//Traemos las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js
 const EjerciciosRoutes=require('./src/routes/EjerciciosRoutes');//Traemos las rutas de ejercicios,que las tenemos definidas en el archivo EjerciciosRoutes.js
+const RutinasRoutes=require('./src/routes/RutinasRoutes');//Traemos las rutas de rutinas,que las tenemos definidas en el archivo RutinasRoutes.js
 require('dotenv').config();//Para poder usar las variables de entorno,que las tenemos definidas en el archivo .env
+
 const app=express();
 app.use(express.json());//Le decimos a express que vamos a usar json,para poder enviar y recibir datos en formato json
 app.use(express.urlencoded({extended:true}));//Le decimos a express que vamos a usar urlencoded,para poder enviar y recibir datos en formato urlencoded
@@ -25,8 +27,9 @@ async function ConectionDB(){
 }
 ConectionDB();
 app.use('/api/auth',UsuariosRoutes);//Le decimos a express que vamos a usar las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js, y que van a estar disponibles en la ruta /api/auth
-app.use('/api/auth',UsuariosRoutes);//Le decimos a express que vamos a usar las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js, y que van a estar disponibles en la ruta /api/usuarios
+
 app.use('/api/ejercicios',EjerciciosRoutes)
+app.use('/api/rutinas',RutinasRoutes)
 //Ahora vvamos a escuchar el puerto,que lo tenemos definido en la variable de entorno
 const PORT=process.env.RUTA || 3000;
 app.listen(PORT,()=>{

@@ -49,7 +49,7 @@ const ActualizarEjercicio=async(req,res)=>{
       }
       else{
           try{
-            const id=req.params.id;
+            const id=parseInt(req.params.id);
             const {nombre,categoria,video}=req.body;
             const EejercicioActualizado=await prisma.ejercicios.update({
                 where:{id_ejercicio:id},
@@ -72,7 +72,7 @@ const EliminarEjercicio=async(req,res)=>{
 }
 else{
     try{
-        const id=req.params.id;
+        const id=parseInt(req.params.id);
         const EjercicioEliminado=await prisma.ejercicios.delete({
             where:{id_ejercicio:id}
 
