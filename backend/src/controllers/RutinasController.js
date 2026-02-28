@@ -1,4 +1,5 @@
 //Aquí vamos a implementar el CRUD de las rutinas,es decir funciones para crear,leer,actualizar y eliminar rutinas
+const { parse } = require('dotenv');
 const prisma=require('../db/db');//Traemos la base de datos,para poder hacer el CRUD
 const { connect } = require('../routes/RutinasRoutes');
 
@@ -20,7 +21,9 @@ const CrearRutina=async(req,res)=>{
                         nombre_rutina:nombre_rutina,
                         id_usuario:id_usuario,
                         rutinas_ejercicios:{
-                            create:id_ejercicio.map(id=>({ejercicios:{connect:{id_ejercicio:id}}})),
+                            create:id_ejercicio.map(ej=>
+                            ({duracion_ejercicio:ej.duracion_ejercicio || null,duracion_descanso:ej.duracion_descanso || null,ejercicios:{connect:{id_ejercicio:parseInt(ej.id)}}})
+                            ),
                             
                         }
                     },

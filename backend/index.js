@@ -7,6 +7,8 @@ const prisma=require('./src/db/db');//Traemos la base de datos,que tenemos defin
 const UsuariosRoutes=require('./src/routes/UsuariosRoutes');//Traemos las rutas de usuarios,que las tenemos definidas en el archivo UsuariosRoutes.js
 const EjerciciosRoutes=require('./src/routes/EjerciciosRoutes');//Traemos las rutas de ejercicios,que las tenemos definidas en el archivo EjerciciosRoutes.js
 const RutinasRoutes=require('./src/routes/RutinasRoutes');//Traemos las rutas de rutinas,que las tenemos definidas en el archivo RutinasRoutes.js
+const Sesiones_historialRoutes=require('./src/routes/Sesiones_historialRoutes');//Traemos las rutas de sesiones_historial,que las tenemos definidas en el archivo Sesiones_historialRoutes.js
+const GamificacionesRoutes=require('./src/routes/GamificacionesRoutes');//Traemos las rutas de gamificaciones,que las tenemos definidas en el archivo GamificacionesRoutes.js
 require('dotenv').config();//Para poder usar las variables de entorno,que las tenemos definidas en el archivo .env
 
 const app=express();
@@ -30,6 +32,8 @@ app.use('/api/auth',UsuariosRoutes);//Le decimos a express que vamos a usar las 
 
 app.use('/api/ejercicios',EjerciciosRoutes)
 app.use('/api/rutinas',RutinasRoutes)
+app.use('/api/sesiones_historial',Sesiones_historialRoutes)
+app.use('/api/gamificaciones',GamificacionesRoutes)
 //Ahora vvamos a escuchar el puerto,que lo tenemos definido en la variable de entorno
 const PORT=process.env.RUTA || 3000;
 app.listen(PORT,()=>{
