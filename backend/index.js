@@ -34,6 +34,7 @@ app.use('/api/ejercicios',EjerciciosRoutes)
 app.use('/api/rutinas',RutinasRoutes)
 app.use('/api/sesiones_historial',Sesiones_historialRoutes)
 app.use('/api/gamificaciones',GamificacionesRoutes)
+
 //Ahora vvamos a escuchar el puerto,que lo tenemos definido en la variable de entorno
 const PORT=process.env.RUTA || 3000;
 app.listen(PORT,()=>{

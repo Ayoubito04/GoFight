@@ -71,7 +71,7 @@ const RegistrarHistorial=async(req,res)=>{
                   }
              }
              await ActualizarGamificaciones(Fakereq,Fakeres);//Con esto ya actualizamos las gamificaciones,teniendo en cuenta el id del usuario y las calorias perdidas
-               res.status(201).json({message:'Sesión registrada exitosamente',nuevaSesion,ActualizarGamificaciones,calorias:CalcularCalorias});
+               res.status(201).json({message:'Sesión registrada exitosamente',nuevaSesion,gamificacionesTotales,calorias:CalcularCalorias});
 
          }
 
@@ -79,4 +79,47 @@ const RegistrarHistorial=async(req,res)=>{
          res.status(500).json({message:'Error al registrar el historial',error:error.message});
     }
 }
-module.exports={RegistrarHistorial}
+
+const MostrarHistorial=async(req,res)=>{
+    //Aquí se va a mostrar el historial de sesiones de entrenamiento,teniendo en cuenta el id del usuario
+    const id_usuario=req.user?.id;
+    try{
+        const historial=await prisma.sesiones_historial.findMany({
+            where:{id_usuario:id_usuario},
+            include:{rutinas:true},
+            orderBy:{fecha_entreno:'desc'}
+
+        })
+        if(historial.length===0){
+            //Si no se encuentra ningún historial,le indicamos al usuario que no se han encontrado sesiones de entrenamiento
+                return res.status(404).json({message:'No se han encontrado sesiones de entrenamiento para este usuario'});
+        }
+        else{
+            res.status(200).json({message:'Historial obtenido exitosamente',historial});
+        }
+
+    }catch(error){
+          res.status(500).json({message:'Error al obtener el historial',error:error.message});
+    }
+    
+
+}
+const VerSesionesPorId=async(req,res)=>{
+    //Primero necesitamos el id del usuario antes de mostrar las sesiones
+     const id_usuario=req.user?.id;
+     try{
+         const sesioneId=await prisma.sesiones_historial.findMany({
+            where:{id_usuario:id_usuario},
+            include:{rutinas:true}
+            
+         });
+         if(!sesioneId){
+             res.status(404).json({message:'No se han encontrado sesiones de entrenamiento para este usuario'});
+         }
+            res.status(200).json({message:'Sesiones de entrenamiento obtenidas exitosamente',sesioneId});
+
+     }catch(error){
+           res.status(500).json({message:'Error al obtener las sesiones de entrenamiento',error:error.message})
+     }
+}
+module.exports={RegistrarHistorial, MostrarHistorial, VerSesionesPorId}

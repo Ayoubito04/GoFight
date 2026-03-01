@@ -35,7 +35,10 @@ const ActualizarGamificaciones=async(req,res)=>{
 
                     
                 }
+                
             })
+           
+
 
     }
     //Sin el usuario no tiene gamificaciones,lo creamos con una racha de 0 días y 0 puntos
@@ -55,6 +58,8 @@ const ActualizarGamificaciones=async(req,res)=>{
               fechaUltimaSesion.setHours(0,0,0,0);//Establecemos la hora a 00:00:00
               if(fechaUltimaSesion.getTime()===hoy.getTime()){
                 mensaje='Dale duro,que seguro que superas a mi abuela,por hoy has restablecido la racha'
+                 racha_dias+=1;
+                    puntos_ranking+=10;
 
                 
 
@@ -89,4 +94,22 @@ else{
     res.status(500).json({message:'Error al actualizar las gamificaciones',error:error.message});
 }
 }
-module.exports={ActualizarGamificaciones}
+const VerGamificaciones=async(req,res)=>{
+      const id_usuario=req.user?.id;
+      console.log('ID del usuario desde VerGamificaciones:', id_usuario); // Agrega este console.log para verificar el ID del usuario
+      try{
+          const gamificaciones=await prisma.gamificaciones.findFirst({
+                  where:{id_usuario:id_usuario}
+
+          })
+          if(!gamificaciones){
+             return res.status(404).json({message:'No se han encontrado gamificaciones para este usuario'
+                +gamificaciones
+             });
+          }
+            res.status(200).json({message:'Gamificaciones obtenidas exitosamente',gamificaciones});
+      }catch(error){
+          res.status(500).json({message:'Error al obtener las gamificaciones',error:error.message});
+      }
+}
+module.exports={ActualizarGamificaciones, VerGamificaciones}
