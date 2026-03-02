@@ -9,8 +9,6 @@ const router=require('express').Router();
 //Vale,una vez que traigamos el controlador de autenticación,definimos las rutas de registro
 router.post('/registro',upload.single('perfil'),authController.registro);//Definimos la ruta de registro,que va a ser una ruta post,porque vamos a enviar datos al servidor
 router.post('/login',authController.login);//Definimos la ruta de inicio de sesión,que va a ser una ruta post,porque vamos a enviar datos al servidor
-
-router.delete('/eliminar',authMiddleware,UsuariosController.EliminarUsuario);//Definimos la ruta para eliminar el usuario deseado
 router.put('/actualizar_perfil',authMiddleware,upload.single('perfil'),UsuariosController.ActualizarUsuario);//Definimos la ruta para actualizar el usuario
 router.delete('/eliminar_todos',authMiddleware,UsuariosController.EliminarTodosUsuarios);//Definimos la función para borrar todos los usuarios,esta función es propia del administrador
 router.get('/panel_usuarios',authMiddleware,UsuariosController.getAllUsuarios);//Solo el admin puede ver a todos los usuarios

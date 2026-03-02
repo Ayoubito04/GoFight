@@ -1,22 +1,7 @@
 //Aquí vamos a definir las funciones crud de la base de datos
 const prisma=require('../db/db');//Traemos la base de datos,que tenemos definiada en el archivo db.js,que es donde vamos a definir la conexión a la base de datos
 
-const EliminarUsuario=async(req,res)=>{
-    const id=req.user.id;
-    try{
-        const EliminarUsuario=await prisma.usuarios.delete({
-            where:{id_usuario:id}//Ponemos la condición,es decir buscará al usuario por su id
-        })
-        if(!EliminarUsuario){
-            return res.status(404).json({message:'Usuario no encontrado,compruebe que exista'});
-        }
-        res.status(200).json({message:'Usuario eliminado exitosamente',EliminarUsuario});
 
-    }catch(error){
-        res.status(500).json({message:'Error al eliminar el usuario',error:error.message});
-    }
-
-}
 const ActualizarUsuario=async(req,res)=>{
     //Vamos con la función de actualizar usuarios
     try{
@@ -134,4 +119,4 @@ const VerPerfilUsuario=async(req,res)=>{
         res.status(500).json({message:'Error al obtener el perfil del usuario',error:error.message});
     }
 }
-module.exports={EliminarUsuario,ActualizarUsuario,EliminarTodosUsuarios,getAllUsuarios,MakeAdmin,DeleteUserById,VerPerfilUsuario};//Exportamos las funciones de getUsuario,EliminarUsuario y ActualizarUsuario,para poder usarlas en el archivo UsuariosRoutes.js,que es donde vamos a definir las rutas de usuarios
+module.exports={ActualizarUsuario,EliminarTodosUsuarios,getAllUsuarios,MakeAdmin,DeleteUserById,VerPerfilUsuario};//Exportamos las funciones de getUsuario,EliminarUsuario y ActualizarUsuario,para poder usarlas en el archivo UsuariosRoutes.js,que es donde vamos a definir las rutas de usuarios
