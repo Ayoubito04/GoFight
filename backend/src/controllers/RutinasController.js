@@ -71,12 +71,11 @@ const EliminarRutinas=async(req,res)=>{
 const VerRutinas=async(req,res)=>{
     //Aquí el usuario podrá entrar a la biblioteca y ver sus rutinas,como si fuera un historial de rutinas
      const id_usuario=req.user?.id;//Importante obtener el id del usuario
-     const rutinas=await prisma.rutinas.findMany({
-        where:{id_usuario:id_usuario},
-     });
       try{
            const rutinas=await prisma.rutinas.findMany({
-                  where:{id_usuario:id_usuario},
+                  where:{OR:
+                    [{id_usuario:id_usuario},{id_usuario:1}]//Aquí vamos a mostrar las rutinas del usuario,pero también las rutinas publicas del admin
+                  },
                   select:{
                     id_rutina:true,
                     nombre_rutina:true,

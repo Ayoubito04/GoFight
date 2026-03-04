@@ -13,14 +13,14 @@ const prisma=new PrismaClient({
 })
 
 const crearAdmin=async()=>{
-    const adminEmail='admin@GoFight.com';//Definimos el correo electrónico del administrador
+    const adminEmail='admin@admin.com';//Definimos el correo electrónico del administrador
     const adminPassword='admin123';//Definimos la contraseña del administrador
     const salt=await bcrypt.genSalt(10);//Generamos un salt,que nos servirá para hashear la contraseña
     const hashPassword=await bcrypt.hash(adminPassword,salt);//Hasheamos la contraseña del administrador con el salt generado
     try{
         const admin=await prisma.usuarios.upsert({
             where:{email:adminEmail},
-            update:{},
+            update:{contrasena:hashPassword},//Actualizamos en el caso de querer de cambiar la contraseña del administrador
             create:{
                 nombre:'Admin',
                 email:adminEmail,

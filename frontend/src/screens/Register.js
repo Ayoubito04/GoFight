@@ -5,13 +5,15 @@ import {useState,useEffect} from 'react';
 import {registerUser} from '../services/services';
 import Button from '../components/Button';
 import TextInputComponent from '../components/TextInput';
-import { Link } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {Ionicons} from '@expo/vector-icons';
+import ErrorMsg from '../components/ErrorMsg';
 
 //Traemos el servicio para poder registrar el usuario desde el frontend,que es la función que hemos creado en services.js,que se encarga de hacer la petición a la API para registrar el usuario en la base de datos
 
 export default function Register({}){
          const [nombre,setNombre]=useState('');
-         const [apellido,setApellido]=useState('');
+         
             const [email,setEmail]=useState('');
             const [password,setPassword]=useState('');
             const [confirmPassword,setConfirmPassword]=useState('');
@@ -32,7 +34,7 @@ export default function Register({}){
         },[]);
          if(laoding){
             return(
-                <View style={styles.Container}>
+                <View style={styles.LoadingContainer}>
                     <ActivityIndicator size="large" color="#ff0000"/>
                 </View>
             )
@@ -40,7 +42,7 @@ export default function Register({}){
 
          }
           const handleClick=async()=>{
-              if(!nombre || !apellido || !email || !password || !confirmPassword){
+              if(!nombre  || !email || !password || !confirmPassword){
                    setMessage('Por favor,complete todos los campos');
                    
               }
@@ -50,7 +52,7 @@ export default function Register({}){
                 else{
                     await registerUser(nombre,email,password,'user');
                     setNombre('');
-                    setApellido('');
+                    
                     setEmail('');
                     setPassword('');
                     setConfirmPassword('');
@@ -58,38 +60,34 @@ export default function Register({}){
                 }
 
           }
+          const navigation=useNavigation();
+          //Vamos a implemenatar la lógica para navegar a la pantalla de login
+          const handleToLogin=()=>{
+                navigation.navigate('login');
+          }
+
             return(
                 <View style={styles.Container}>
+                    <View style={styles.FlexView}>
+                        <Text style={styles.TitleStyle}>GoFight</Text>
+                        <Ionicons name="hand-left-outline" size={20} color="red" style={styles.IconStyle}/>
+
+                    </View>
+                    <View>
+                         <Text style={styles.RegistrarseText}>Registrarse</Text>
+                    </View>
+                        {message ? <ErrorMsg message={message}/> : null}
+
                     <ScrollView style={styles.FormStyle}>
-                        <View style={styles.ViewStyle}>
-                            <Text style={styles.TitleStyle}>GoFight</Text>
-                           
-                        </View>
-                        <View>
-                            <TextInputComponent placeholder="Nombre" value={nombre} onChangeText={setNombre} iconName="person"/>
-                        </View>
-                        <View>
-                            <TextInputComponent placeholder="Apellido" value={apellido} onChangeText={setApellido} iconName="person"/>
-                        </View>
-                        <View>
-                            <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} iconName="mail"/>
-                        </View>
-                        <View>
-                            <TextInputComponent placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} iconName="lock"/>
-                        </View>
-                        <View>
-                            <TextInputComponent placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry={true} iconName="lock"/>
-                        </View>
-                        <View>
-                            <Button title="Registrar" onPress={handleClick}/>
+                        <TextInputComponent placeholder="Nombre" value={nombre} onChangeText={setNombre} iconName="person-outline"/>
+                        <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" iconName="mail-outline"/>
+                        <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
+                        <TextInputComponent placeholder="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry iconName="lock-closed-outline"/>
+                        <Button title="Registrar" onPress={handleClick}/>
+                        <TouchableOpacity onPress={handleToLogin}>
+                            <Text style={styles.LinkStyle}>¿Ya tienes una cuenta? Inicia sesión</Text>
+                        </TouchableOpacity>
                        
-                        </View>
-                        <View>
-                            <Text style={styles.Mensajes}>{message}</Text>
-                            <Text>
-                            <Link to='/login' style={styles.LinkStyle}>¿Ya tienes una cuenta? Inicia sesión</Link>
-                            </Text>
-                        </View>
                     </ScrollView>
                 </View>
             )
@@ -103,9 +101,33 @@ const styles=StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
         padding:20,
+        backgroundColor:'black',
         
         
       },
+      LoadingContainer:{
+         flex:1,
+         justifyContent:'center',
+         alignItems:'center',
+         backgroundColor:'black',
+      },
+      IconStyle:{
+        marginLeft:10,
+        marginTop:10,
+        color:'red',
+      },
+      FlexView:{
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center',
+      },
+      RegistrarseText:{
+        fontSize:20,
+        fontWeight:'bold',
+        marginBottom:20,
+        color:'white',
+        paddingTop:20,
+        },
       TitleStyle:{
         fontSize:24,
         fontWeight:'bold',
@@ -114,6 +136,10 @@ const styles=StyleSheet.create({
         margin:0,
         alignContent:'center',
         textAlign:'center',
+        color:'red',
+        fontFamily:'Arial',
+        
+
 
 
       },
@@ -122,7 +148,10 @@ const styles=StyleSheet.create({
         marginBottom:20,
         padding:20,
         borderRadius:10,
-        backgroundColor:'#f2f2f2',
+        backgroundColor:'transparent',
+        borderColor:'red',
+
+
         
       },
       FormStyle:{
@@ -130,7 +159,14 @@ const styles=StyleSheet.create({
         marginBottom:20,
         padding:20,
         borderRadius:10,
-        backgroundColor:'#f2f2f2',
+        backgroundColor:'transparent',
+        borderColor:'red',
+        borderWidth:1,
+        boxShadow:'5px 20px 15px rgba(255,0,0,0.2)',
+        shadowColor:'red',
+
+
+
       },
 
       TextInput:{
@@ -156,6 +192,12 @@ const styles=StyleSheet.create({
         color:'red',
         marginBottom:10,
         textAlign:'center',
+        borderColor:'red',
+        borderWidth:1,
+        padding:10,
+        borderRadius:5,
+        top:10,
+        
       },
       LinkStyle:{
         color:'#007bff',
