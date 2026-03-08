@@ -136,11 +136,47 @@ export const getGamificaciones=async()=>{
             throw error;
        }
 }
-//----------SesionesHistorialo---------//
+//----------Sesiones Historial---------//
 export const getSesionesHistorial=async()=>{
      //Aquí vamos a obtenere todas las sesiones del usuario
-     const token=AsyncStorage.getItem('token');//Obtenemos el token del usuario loegado
-     const url=await fetch(`${BASE_URL}/sesiones_historial`,{
+     try{
+        const token= await AsyncStorage.getItem('token');//Obtenemos el token del usuario loegado
+     const url=await fetch(`${BASE_URL}/sesiones_historial/obtener_historial_de_sesiones`,{
+        headers:{'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
 
-})
+
+}     });
+       const text=await url.text();
+       console.log('Respuesta del servidor al obtener el historial de sesiones:',text);
+       const data=JSON.parse(text);
+       if(!url.ok){
+            throw new Error(data.message || `Error al obtener el historial de sesiones ${error.message}`);
+       }
+         return data;
+     }catch(error){
+         throw error;
+     }
+
+}
+//------------Rutinas-----------------//
+
+//Vamos a a traer las rutinas,para que el usuario pueda ver las sesiones que tiene en el historial
+export const getRutinas=async()=>{
+      try{
+            const token= await AsyncStorage.getItem('token');//Obtenemos el token del usuario loegado
+             const url=await fetch(`${BASE_URL}/rutinas/ver_rutinas`,{
+                headers:{'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+                  }
+      });
+       const text=await url.text();
+       console.log('Respuesta del servidor al obtener las rutinas:',text);
+       const data=JSON.parse(text);
+       if(!url.ok){
+            throw new Error(data.message || `Error al obtener las rutinas ${data.message}`);
+       }
+         return data;
+     }catch(error){
+         throw error;
+     }
+
 }
