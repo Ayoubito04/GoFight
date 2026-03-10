@@ -20,7 +20,7 @@ app.use(cors());
 async function ConectionDB(){
     try{
         await prisma.$connect();
-        console.log('Conexión a la base de datos exitosa');
+        console.log('Conexión a la base de datos exitosa');//mario
         
     }
     catch(error){
