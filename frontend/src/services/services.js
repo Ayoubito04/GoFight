@@ -1,5 +1,5 @@
 //Vamos a traer la base de datos para poder hacer las consultas desde el frontend
-const BASE_URL='http://192.168.0.22:3000/api';
+const BASE_URL='http://192.168.18.49:3000/api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //Ahora vamos a crear cada una de las funciones para hacer las peticiones a la API,tendremos que hacer un fecth,para poder conectarse a la API

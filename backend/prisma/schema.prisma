@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
-  previewFeatures = ["driverAdapters"]
+  // previewFeatures ya no hace falta
 }
 
 datasource db {
@@ -29,7 +29,7 @@ model rutinas {
   id_usuario         Int?
   nombre_rutina      String               @db.VarChar(150)
   dificultad         dificultad?
-  usuarios           usuarios?   @relation(fields:[id_usuario],references:[id_usuario],onDelete:Cascade,onUpdate:NoAction)
+  usuarios           usuarios?            @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction)
   rutinas_ejercicios rutinas_ejercicios[]
   sesiones_historial sesiones_historial[]
 }
@@ -54,10 +54,7 @@ model sesiones_historial {
   rutinas             rutinas?  @relation(fields: [id_rutinas], references: [id_rutina], onDelete: Cascade, onUpdate: NoAction)
   usuarios            usuarios? @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction)
 }
-enum Role{
-  admin
-  user
-}
+
 model usuarios {
   id_usuario         Int                  @id @default(autoincrement())
   nombre             String               @db.VarChar(150)
@@ -66,8 +63,13 @@ model usuarios {
   rol                Role                 @default(user)
   perfil             String?
   gamificaciones     gamificaciones[]
-  sesiones_historial sesiones_historial[]
   rutinas            rutinas[]
+  sesiones_historial sesiones_historial[]
+}
+
+enum Role {
+  admin
+  user
 }
 
 enum categoria {
