@@ -4,7 +4,13 @@ const {PrismaClient}=require('../generated/prisma');//Traemos PrismaClient,que e
 const bcrypt=require('bcrypt');//Traemos bcrypt para hashear la contraseña del usuario
 const {PrismaPg}=require('@prisma/adapter-pg');//Traemos el adapter para que se pueda conectar a nuestra base de datos de pgadmin
 const {Pool}=require('pg');//Traemos Pool para crear una conexión a la base de datos de pgadmin
+<<<<<<< HEAD
 
+=======
+require('dotenv').config({ path: '../../.env' });//Traemos dotenv para poder usar las variables de entorno,que tenemos definidas en el archivo .env,que es donde vamos a definir la conexión a la base de datos y el puerto del servidor
+console.log('DATABASE_URL tipo:', typeof process.env.DATABASE_URL);
+console.log('DATABASE_URL:', process.env.DATABASE_URL);
+>>>>>>> f410c2aecef2430ac551011c809da287d77cf073
 const pool=new Pool({
     connectionString:process.env.DATABASE_URL
 
