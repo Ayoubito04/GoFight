@@ -4,7 +4,7 @@ import {View,Text,StyleSheet,Animated,ActivityIndicator} from 'react-native';//I
 import { useState,useEffect } from "react";
 import {Ionicons} from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-const BarraProgreso=({caloriasActuales,caloriasObjetivo=1000})=>{
+const BarraProgreso=({caloriasActuales,caloriasObjetivo})=>{
       //Vamos a crear una barra de progreso para mostrar la evolución del usuario teniendo en cuenta las calorias quemadas,para esto vamos a usar el hook de useRef para crear una animación de la barra de progreso,que se va a actualizar cada vez que se registre una sesión en el historial,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
        
         const [loading,setLoading]=useState(true);

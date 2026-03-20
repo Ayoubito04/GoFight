@@ -187,7 +187,14 @@ export const getRutinas=async()=>{
      }
 
 }
-//-------Vamos a obtener las sesiones del historial,para poder obtener el total de calorias quemadas---//
+//-------Vamos a obtener las sesiones del historial,para poder obtener el total de calorias quemadas---
+//---Vamnos a intentar obtener el total de calorias quemadas,para mostrarlo en la barra de progreso
+const Hoy=()=>{
+      const fechaActual=new Date();//Obtenemos la fecha actual
+      fechaActual.setHours(0,0,0,0);
+       fechaActual.toISOString().split('T')[0];
+       return fechaActual;
+}
 export const getTotalCaloriasQuemadas=async()=>{
     //Primero vamos a obtener el token del usuario logeado,para poder ver el porgreso del usuario
       const token=await AsyncStorage.getItem('token');
@@ -203,14 +210,13 @@ export const getTotalCaloriasQuemadas=async()=>{
            if(!url.ok){
                 throw new Error(data.message || `Error al obtener el historial de sesiones para calcular las calorías quemadas ${error.message}`);
            }
-              const sesiones=data.historial;
-              const totalCaloriasQuemadas=sesiones.reduce((total,sesiones)=>{
-                     return  total+Number(sesiones.calorias);
-              },0);
-               return totalCaloriasQuemadas;
+              const sesiones=data.caloriasQuemadas || 0;
+              console.log('Calorías quemadas obtenidas del historial de sesiones:', sesiones);
+                return sesiones;
                
       }catch(error){
            throw error;
+        
       }
         
 }

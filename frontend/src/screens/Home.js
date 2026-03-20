@@ -23,12 +23,29 @@ const Home=()=>{
      useEffect(()=>{
         //Aquí vamos a simular la pantalla de carga
         setTimeout(async ()=>{
-             setLoading(false);
-             await ActualizarGamificaciones();//Actualizamos las gamificaciones,teniendo en cuenta la fecha actual y la fecha de la ultima sesión,para que se actualicen cada vez que se registre una sesión en el historial,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
-             const data=await getGamificaciones();//Obtenemos las gamificaciones mediante un await
+             
+              try{
+                 await ActualizarGamificaciones();//Actualizamos las gamificaciones cada vez que se registre una sesión en el historial,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
+                const res=await ActualizarGamificaciones();
+                console.log('Respuesta de actualizar gamificaciones:', res);
+                const calHoy=await  parseInt(res.caloriasQuemadas,10) || 0;
+                     setCaloriasQuemadas(calHoy);
+                    console.log('Calorías quemadas hoy obtenidas de la respuesta de actualizar gamificaciones:', calHoy);
+                
+             
+             
+             
+                 const data=await getGamificaciones();//Obtenemos las gamificaciones mediante un await
                 setGamificaciones(data);
-                const totalCalorias=await getTotalCaloriasQuemadas();
-                setCaloriasQuemadas(totalCalorias);
+                
+
+              }catch(error){
+                  console.log('Error al actualizar las gamificaciones:', error);
+              }
+              finally{
+                    setLoading(false);
+              }
+
 
                 //Vamos a simular una carga de 2 segundos,para que se muestre la pantalla de carga,antes de mostrar la pantalla de inicio
              //La función va esperar 2 segundos a que la carga termine
@@ -46,8 +63,8 @@ const Home=()=>{
                <SafeAreaView style={style.Container}>
                      <Header/>
                       <ScrollView>
-                          <StackContainer/>
-                              <BarraProgreso caloriasActuales={caloriasQuemadas} caloriasObjetivo={2000}/>
+                          <StackContainer datos={gamificaciones}/>
+                              <BarraProgreso caloriasActuales={caloriasQuemadas} caloriasObjetivo={1000}/>
                       </ScrollView>
                       
                      <Footer/>

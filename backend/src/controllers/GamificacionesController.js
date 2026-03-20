@@ -6,6 +6,8 @@ const ActualizarGamificaciones=async(req,res)=>{
     //En vez de crear gamificaciones,solo ls vamos a actualizar,ya que la racha y el ranking son por defecto =0
     //Tenemos que tener el cuenta la fecha actual,ya que la racha se tiene que actualizar cada día
     const hoy=new Date();
+    const manana=new Date(hoy);
+    manana.setDate(hoy.getDate()+1);//Obtenemos la fecha de mañana sumando un día,esto es para que la app,tenga en cuenta cuantos días estan pasando verdaderamente
     hoy.setHours(0,0,0,0);//Establecemos la hora a 00:00:00 para comparar solo la fecha
     const ayer=new Date(hoy);
     ayer.setDate(hoy.getDate()-1);//Obtenemos la fecha de ayer restando un día,esto es para que la app,tenga en cuenta cuantos días estan pasando verdaderamente
@@ -21,7 +23,18 @@ const ActualizarGamificaciones=async(req,res)=>{
             }
         })
                 //La lógica Date tiene en cuenta la fecha y hora actual y este valor se resta a la fecha de ayer
-        
+        const  sumCalorias=await prisma.sesiones_historial.aggregate({
+            _sum:{calorias:true},
+            where:{
+                id_usuario:req.user?.id,
+                fecha_entreno:{
+                    gte:hoy,
+                    lt: manana
+                }
+            }
+        })
+        const totalCaloriasQuemadas=sumCalorias._sum.calorias || 0;
+        //Aquí se calculan total de calorias quemadas hoy
         let gamificaciones=await prisma.gamificaciones.findFirst({
             where:{id_usuario:req.user?.id}
         });
@@ -48,7 +61,8 @@ const ActualizarGamificaciones=async(req,res)=>{
             //Si el usuario ha entrenado hoy,la racha se mantiene,incluso va incrementando poco a poco
             return res.status(200).json({
                 message:"Ya has actualizado la racha de hoy,no puedes actaulizarla hasta mañana,pero no te preocupes,que seguro que superas a mi abuela,que se note que eres un/a crack",
-                gamificaciones
+                gamificaciones,
+                caloriasQuemadas:totalCaloriasQuemadas
             })
         }
     }
@@ -71,8 +85,8 @@ const ActualizarGamificaciones=async(req,res)=>{
               fechaUltimaSesion.setHours(0,0,0,0);//Establecemos la hora a 00:00:00
               if(fechaUltimaSesion.getTime()===hoy.getTime()){
                 mensaje='Dale duro,que seguro que superas a mi abuela,por hoy has restablecido la racha'
-                 racha_dias+=1;
-                    puntos_ranking+=10;
+                racha_dias+=1;
+                puntos_ranking+=10;
                    
 
                 
@@ -91,6 +105,10 @@ else{
     puntos_ranking=Math.max(0,puntos_ranking-10);
     mensaje='Has perdido tu racha de días consecutivos,como se nota que mi abuela pega más,eres un/a vago/a,anda campeon/a,espabila,que la vida son dos días...'
 }
+if(totalCaloriasQuemadas>=1000){
+     puntos_ranking+=20;
+     mensaje=`Enhorabuena,has quemado ${totalCaloriasQuemadas} calorías hoy,te has ganado 20 puntos de ranking,que se note que eres un/a crack,mi abuela estaría orgullosa de ti`
+}
   //Ahora sí que lo actualizamos en la base de datos,con la nueva racha y puntos de ranking
      
 }
@@ -103,7 +121,7 @@ else{
         //Ahora toca avisar al usuario de su neuva racha
 
       });
-      res.status(200).json({message:mensaje, gamificaciones:gamificacionesActualizadas});
+      res.status(200).json({message:mensaje, gamificaciones:gamificacionesActualizadas,caloriasQuemadas:totalCaloriasQuemadas});
 }catch(error){
     res.status(500).json({message:'Error al actualizar las gamificaciones',error:error.message});
 }
