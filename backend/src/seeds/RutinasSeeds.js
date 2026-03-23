@@ -8,14 +8,16 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 const crearRutinas = async () => {
+    //Primaremente vamos a cragar 5 rutinas,que vienen predtermibnadas en la app,estas rutinas estaran vinculadas a varios ejercicios,se vinculara´na por el id del ejercicio y estas rutinas serán del administrador
+    //Los usuarios pueden ver sus rutinas que han creado,pero si no saben como crear una rutina,tienen rutinas disponibles y predeterminadas
   try {
     const r1 = await prisma.rutinas.create({
       data: {
-        nombre_rutina: 'Iniciación al Boxeo',
-        dificultad: Dificultad.F_cil,
-        usuarios: { connect: { id_usuario: 1 } },
+        nombre_rutina: 'Iniciación al Boxeo',//Definimos el nombre de la rutina
+        dificultad: Dificultad.F_cil,//Dificultad
+        usuarios: { connect: { id_usuario: 1 } },//Los vinculamos al usuario administrador
         rutinas_ejercicios: { create: [
-          { id_ejercicios: 5, orden: 1, duracion_ejercicio: 120, duracion_descanso: 60 },
+          { id_ejercicios: 5, orden: 1, duracion_ejercicio: 120, duracion_descanso: 60 },//Creamos la relación entre rutina y ejercicio,todo esto aparece dentro de la tabla intermedia
           { id_ejercicios: 3, orden: 2, duracion_ejercicio: 120, duracion_descanso: 60 },
           { id_ejercicios: 8, orden: 3, duracion_ejercicio: 90,  duracion_descanso: 45 },
         ]},

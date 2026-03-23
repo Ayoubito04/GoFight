@@ -3,6 +3,7 @@ const BASE_URL=process.env.EXPO_PUBLIC_SERVICES_URL;
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
+
 //Ahora vamos a crear cada una de las funciones para hacer las peticiones a la API,tendremos que hacer un fecth,para poder conectarse a la API
 //Empezamos por el auth,que es la función de resgistro de usuarios
 //---------------AUTH----------------//
@@ -240,5 +241,36 @@ export const getTotalCaloriasQuemadas=async()=>{
 }catch(error){
     throw error;
 }
+}
+export const getRutinasDisponibles=async()=>{
+    //Vamos a imprimir p0or la pantalla diferentes rutinas disponibles,para que el usuario pueda elegir la rutina,estas rutinas vienen vinculadas con id,este id es del administrador
+    try{
+        const token=await AsyncStorage.getItem('token');
+        //Obtenemos el token del usuario logeado para poder acceder a las rutinas disponibles
+        const url=await fetch(`${BASE_URL}/rutinas/ver_rutinas`,{
+            headers:{'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            }
+        });
+        //Obtenemos las rutinas disponibles,que son las rutinas del administrador,para que el usuario pueda elegir la rutina que quiera hacer
+        const text=await url.text();
+      
+         console.log('Respuesta del servidor al obtener las rutinas disponibles:',text);
+         const data=JSON.parse(text);
+         if(!url.ok){
+                throw new Error(data.message || `Error al obtener las rutinas disponibles ${error.message}`);
+            }
+            if(data.rutinas && Array.isArray(data.rutinas)){
+                data.rutinas=data.rutinas.map(rutina=>({
+                    ...rutina,
+                    dificultad:rutina.dificultad==='F_cil' ? 'Fácil' : rutina.dificultad // Asignamos un valor por defecto si dificultad es null
+
+                }));
+            }
+            return data;
+            //Esto nos retornará las rutinas disponibles,que son como bien hemos dicho rut9inas del adminstrador
+            
+    }catch(error){
+        throw error;
+    }
 }
 
