@@ -1,6 +1,5 @@
 //Aquí vamos a definir el componente footer,que es el pie de la aplicación,dónde se va a colocar cada uno de las secciones de la aplicación
-import React from 'react';
-import {View,Text,StyleSheet,FlatList, Touchable, TouchableOpacity} from 'react-native';
+import {View,Text,StyleSheet,FlatList,TouchableOpacity} from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -25,25 +24,24 @@ const Footer=()=>{
            alignItems='center'
            justifyContent='center'
            contentContainerStyle={styles.ListStyle}
-           
-           
-           
-          
-             
-            
 
-            
+
+
+
+
+
+
            keyExtractor={(item)=>item.id}
            renderItem={({item})=>{
              return (
              <View style={styles.Item}>
                  <TouchableOpacity style={styles.TouchableOpacity}
                  onPress={() => navigation.navigate(item.screen)}>
-                  <MaterialCommunityIcons name={item.icono} size={24} style={styles.IconStyle}/>  
+                  <MaterialCommunityIcons name={item.icono} size={24} style={styles.IconStyle}/>
 
                  </TouchableOpacity>
                   <Text style={styles.TextStyle}>{item.title}</Text>
-                  
+
              </View>
              )
            }}
@@ -51,7 +49,7 @@ const Footer=()=>{
             </View>
             //Ya hemos definido la FlatList del footer,que va renderizar cada una de las secciones en uno en uno
       )
-     
+
 }
 const styles=StyleSheet.create({
 
@@ -62,8 +60,8 @@ const styles=StyleSheet.create({
       alignItems:'center',
       padding:10,
       gap:10,
-      
-  
+
+
 
 
   },
@@ -74,18 +72,18 @@ const styles=StyleSheet.create({
             padding:10,
             gap:10,
               borderRadius:5,
-              
-              backgroundColor:'#080808',
-             
-              
-              borderTopColor:'rgb(0, 0, 0)'
-         
-        
-           
-           
-           
 
-           
+              backgroundColor:'#080808',
+
+
+              borderTopColor:'rgb(0, 0, 0)'
+
+
+
+
+
+
+
 
 
         },
@@ -93,7 +91,7 @@ const styles=StyleSheet.create({
              borderTopColor:'black',
             borderWidth:1,
             borderRadius:5,
-           
+
               width:80,
               height:80,
               justifyContent:'center',
@@ -101,15 +99,15 @@ const styles=StyleSheet.create({
               alignItems:'center',
               backgroundColor:'black',
               gap:5,
-              
-              
+
+
 
 
         },
         TouchableOpacity:{
               padding:5,
               borderRadius:5,
-              
+
         },
         TextStyle:{
               fontSize:12,
