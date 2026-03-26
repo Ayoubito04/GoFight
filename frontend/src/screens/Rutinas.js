@@ -1,12 +1,13 @@
 //Aquí vamos a simular la carga de cada una de las rutinas,para mostrar la pantalla de carga,antes de mostrar la pantalla de rutinas,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
 import React,{useState,useEffect} from 'react';
-import {View,Text,StyleSheet,ActivityIndicator,SafeAreaView,Platform,StatusBar,FlatList,TextInput} from 'react-native';
+import {View,Text,StyleSheet,ActivityIndicator,SafeAreaView,Platform,StatusBar,FlatList,TextInput,TouchableOpacity} from 'react-native';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/Footer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getRutinasDisponibles } from '../services/services';
 import Button from '../components/Button';
 import TextInputComponent from '../components/TextInput';
+import { useNavigation } from '@react-navigation/native';
 
 
 const Rutinas=()=>{
@@ -52,6 +53,10 @@ const Rutinas=()=>{
                 });
                 setRutinasFiltradas(filtrarRutinas);
         };
+        const navigation=useNavigation();
+        const handleEjercicio=(rutinaId)=>{
+                navigation.navigate('Ejercicios',{rutinaId});
+        }
         if(loading){
                 return( 
                         
@@ -81,9 +86,9 @@ const Rutinas=()=>{
                                        
                                        keyExtractor={item => item.id_rutina.toString()}
                                             renderItem={({item})=>(
-                                                <View style={styles.itemContainer
+                                                <TouchableOpacity style={styles.itemContainer
                                                         
-                                                }>
+                                                }onPress={()=>handleEjercicio(item.id_rutina)}>
                                                         <Text style={styles.TextStyle}>{item.nombre_rutina}</Text>
                                                         <Text style={[
                                                                         item.dificultad === 'Fácil' ? {color:'#00ff00',
@@ -134,7 +139,7 @@ const Rutinas=()=>{
                                                                 {color:'#ffffff'}
                                                         ]}onChangeText={handleSearch}>{item.dificultad}</Text>
                                                <Ionicons name="play" size={20} color="#ffffff" style={{position:'absolute',top:10,right:10}}/>
-                                                </View>
+                                                </TouchableOpacity>
                                             )}
                                  
                               />

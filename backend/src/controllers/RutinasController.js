@@ -138,8 +138,33 @@ const ActualizarRutina=async(req,res)=>{
         res.status(500).json({message:'Error al actualizar la rutina',error:error.message});
     }
 }
+const ObtenerRutinaPorId=async(req,res)=>{
+    //Aquí vamos a obtener una rutina por su id,para mostrar los detalles de la rutina,como el nombre de la rutina,los ejercicios que contiene la rutina y la dificultad de la rutina
+    const id=parseInt(req.params.id);
+    try{
+        const rutina=await prisma.rutinas.findUnique({
+            where:{id_rutina:id},
+            include:{
+                rutinas_ejercicios:{
+                    include:{
+                        ejercicios:true
+                    }
+                }
+            }
+        })
+        if(!rutina){
+            return res.status(404).json({message:'No se ha encontrado la rutina'});
+        }
+        res.status(200).json({message:'Rutina obtenida exitosamente',rutina});
+    }catch(error){
+        res.status(500).json({message:'Error al obtener la rutina',error:error.message});
+
+    }
+}
 module.exports={
     CrearRutina,
     EliminarRutinas,
     VerRutinas,
-    ActualizarRutina}
+    ActualizarRutina,
+    ObtenerRutinaPorId
+}

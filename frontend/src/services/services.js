@@ -273,4 +273,33 @@ export const getRutinasDisponibles=async()=>{
         throw error;
     }
 }
+//----------Ejercicios-----------------//
+//Vamos a traer los ejercicios de la rutina,cuando el usuario le de a una de las rutinas
+export const getEjerciciosDeRutina=async(rutinaId)=>{
+    //Vamos a usar un aparametro en esepcifico que es el id de la rutina,para poder obtener los ejercicios,que contiene esa rutina
+    try{
+        const token=await AsyncStorage.getItem('token');
+        console.log(`Obteniendo ejercicios para la rutina con ID ${rutinaId} utilizando el token:`, token);
+        //Obtenermos siempre el token del usuario
+        const url=await fetch(`${BASE_URL}/rutinas/obtener_ejercicios/${rutinaId}`,{
+            headers:{'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            }
+        });
+        //Esto nos permitirá obtener los ejercicios de la rutina,para que el usuario pueda ver los ejercicios que contiene cadav una d3e la rutinas
+        //Ahora los pasamos a Jason jejejej
+         
+        const text=await url.text();
+
+        console.log(`Respuesta del servidor al obtener los ejercicios de la rutina ${rutinaId}:`,text);
+        const data=JSON.parse(text);
+        if(!url.ok){
+            throw new Error(data.message || `Error al obtener los ejercicios de la rutina ${rutinaId} ${error.message}`);
+        }
+        return data.rutina.rutinas_ejercicios || [];
+        //Nos va a delvolver toda la información de cada uno de los ejercicios y la rutina que hemos escogido
+        
+    }catch(error){
+        throw error;
+    }
+}
 
