@@ -64,7 +64,7 @@ const Home=()=>{
                      <Header/>
                       <ScrollView>
                           <StackContainer datos={gamificaciones}/>
-                              <BarraProgreso caloriasActuales={caloriasQuemadas} caloriasObjetivo={1000}/>
+                              <BarraProgreso caloriasActuales={caloriasQuemadas} caloriasObjetivo={300}/>
                       </ScrollView>
                       
                      <Footer/>

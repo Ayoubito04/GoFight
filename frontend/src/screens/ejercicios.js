@@ -7,13 +7,19 @@ import YouTubePlayer from 'react-native-youtube-iframe';
 import { getEjerciciosDeRutina } from "../services/services";
 import Button from "../components/Button";
 import EjercicioCard from "../components/EjercicioCard";
+import { registrarSesionHistorial } from "../services/services";
 
 
 const Ejercicios=({route})=>{
          const { rutinaId } = route.params;
          const [ejercicios,setEjercicios]=useState([]);//Definimos el edstado de los ehercicios dentro de una array vacia
-         const [tiempo,setTiempo]=useState(0);//Definimos el estado de tiempo de cada de los ejercicios,que después lo pasaremos a un intervalo de tiempo
-        const [ejecutando,setEjecutando]=useState(false);//Definimos el estado de ejecución de cada uno de los ejercicios
+
+        const [caloriasQuemadas,setCaloriasQuemadas]=useState(0);//Definimos el estado de calorias quemadas,que después lo utilizaremos para mostrar el progreso del usuario,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
+        //Definimos el estado de las calorias quemadas,que perderemos en cada una de los ejercicios,que depende de la categoria de ejerciciosl,ya que en el backend se tiene en cuenta categoria*minutos
+
+         const [sesionesCompletadas,setSesionesCompletadas]=useState(0);//Definimos el estado de sesiones completadas,que después lo utilizaremos para mostrar el progreso del usuario,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
+       //Tremos el estado de las sesiones completadas,para mostrar el progreso del usuario,cada vez que registre o inicie su sesión
+
          const [loading,setLoading]=useState(true);
          const ref=useRef(null);//Definimos el estado de la referencia del intervalo de tiempo,que después lo utilizaremos para limpiar el intervalo de tiempo,cuando se detenga la ejecución de cada uno de los ejercicios
          useEffect(()=>{
@@ -51,6 +57,24 @@ const Ejercicios=({route})=>{
 
 
          }
+       
+         const handleSesiones=async()=>{
+                //Vamos a registrar cada una de las sesiones que se completen
+                try{
+                       const res= await registrarSesionHistorial(rutinaId);
+                        //Vamos a tener el cuenta las calorias quemadas por cada  ejercicio
+                        //Vamos a tener en cuenta las calorias quemadas por cada ejercicio,que se calcula en el backend,teniendo en cuenta la categoria de cada ejercicio y la duración de cada ejercicio,ya que en el backend se tiene en cuenta categoria*minutos
+                        console.log("Respuesta de registrar sesión en el historial:", res);
+                                setCaloriasQuemadas(res.calorias);
+                                setSesionesCompletadas(prev=>prev+1);
+                                console.log("Calorías quemadas obtenidas de la respuesta de registrar sesión en el historial:", res.calorias);
+
+                        
+
+                }catch(error){
+                        console.error("Error al registrar la sesión en el historial:",error);
+                }
+         }
          const getYoutubeId = (url) => {
   const match = url.match(/[?&]v=([^&]+)/);
   return match ? match[1] : null;
@@ -78,6 +102,7 @@ const Ejercicios=({route})=>{
                                         
                                         )}
                                 />
+                                        <Button title="Registrar Sesión" onPress={handleSesiones} />
                                 <Footer/>
                         </SafeAreaView>
                 )

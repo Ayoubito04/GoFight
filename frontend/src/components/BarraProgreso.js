@@ -4,6 +4,9 @@ import {View,Text,StyleSheet,Animated,ActivityIndicator} from 'react-native';//I
 import { useState,useEffect } from "react";
 import {Ionicons} from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {LinearGradient} from 'expo-linear-gradient';
+
+
 const BarraProgreso=({caloriasActuales,caloriasObjetivo})=>{
       //Vamos a crear una barra de progreso para mostrar la evolución del usuario teniendo en cuenta las calorias quemadas,para esto vamos a usar el hook de useRef para crear una animación de la barra de progreso,que se va a actualizar cada vez que se registre una sesión en el historial,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
        
@@ -42,7 +45,7 @@ const BarraProgreso=({caloriasActuales,caloriasObjetivo})=>{
         }
         else{
             return(
-                   <View>
+                   <View style={styles.Container}>
                         <View style={styles.TextContainer}>
                            <View style={styles.RowStyle}>
                              <Text style={styles.TextStyle}>calorias quemadas:{caloriasActuales}</Text>
@@ -55,7 +58,14 @@ const BarraProgreso=({caloriasActuales,caloriasObjetivo})=>{
                           
                         </View>
                         <View style={styles.barraProgresoContainer}>
-                              <Animated.View  style={[styles.barraProgreso,{width}]} />
+                               <Animated.View style={{ width, height: 3 }}>
+    <LinearGradient
+      colors={['#ff0000', '#813838', '#ffe6e6']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ flex: 1, borderRadius: 2 }}
+    />
+  </Animated.View>
                               
                         </View>
                          <View style={styles.SubtitleStyleContainer}>
@@ -70,112 +80,89 @@ const BarraProgreso=({caloriasActuales,caloriasObjetivo})=>{
 
 }
 const styles=StyleSheet.create({
+
+    Container:{
+  width: '90%',
+    alignSelf: 'center',
+    marginVertical: 16,
+    },
     barraProgresoContainer:{
-        width:'90%',
-        height:7,
-        backgroundColor:'#333333',
-
-   
-        borderRadius:10,
-        marginTop:10,
-        overflow:'hidden',
-        borderColor:'rgba(255,0,0,0.5)',
-        borderWidth:2,
-        shadowColor:'#ff0000',
-        shadowOffset:{width:0,height:2},
-        shadowOpacity:0.8,
-        shadowRadius:4,
-         elevation:5,
-         alignItems:'center',
-            justifyContent:'center',
-            alignSelf:'center',
-
-
+   width: '100%',
+  height: 3,
+  backgroundColor: '#222',
+  borderRadius: 2,
+  overflow: 'hidden',
     },
         barraProgreso:{
-                height:7,
-                backgroundColor:'#ff0000',
-                borderRadius:10,
-                marginTop:10,
-                alignItems:'center',
-                justifyContent:'center',
-                borderColor:'rgba(255,0,0,0.5)',
-                borderWidth:2,
-                shadowColor:'#fa0000',
-                shadowOffset:{width:0,height:2},
-                shadowOpacity:0.8,
-                shadowRadius:4,
-                 elevation:5,
-                 marginTop:0,
-                 alignItems:'center',
-                 justifyContent:'center',
+             barraProgreso:{
+           height: 3,
+        backgroundColor: '#ff0000',
+           borderRadius: 2,
+           shadowColor: '#ff0000',
+          shadowOffset: { width: 0, height: 0 },
+         shadowOpacity: 0.8,
+         shadowRadius: 4,
+         elevation: 4,
 
         
                 
 
+
+
+        },
 
 
         },
         TextStyle:{
-            fontSize:14,
-            fontWeight:'bold',
-            color:'#ffffff',
-            marginBottom:5,
-            letterSpacing:1,
-            
-            fontFamily:'Helvetica',
-         
-
+          fontSize: 13,
+  fontWeight: '600',
+  color: '#ffffff',
+  letterSpacing: 1.5,
+  textTransform: 'uppercase',
 
 
         },
         RowStyle:{
-            flexDirection:'row',
-            alignItems:'center',
-            justifyContent:'center',
-            gap:5,
-            underlayColor:'rgba(255,0,0,0.1)',
-                padding:5,
-                borderRadius:5,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4,
         
         },
         TextContainer:{
-                alignItems:'center',
-                    justifyContent:'center',
-                    borderColor:'rgba(48, 44, 44, 0.8)',
-                    borderWidth:1,
-                    padding:10,
-                    borderRadius:5,
-                    backgroundColor:'#1a1a1a',
-                    shadowColor:'rgba(255, 82, 82, 0.5)',
-                    shadowOffset:{width:0,height:2},
-                    shadowOpacity:0.8,
-                    shadowRadius:4,
-                    elevation:5,
-                    width:'90%',
-                    alignSelf:'center',
+ alignItems: 'center',
+  justifyContent: 'center',
+  padding: 14,
+  borderRadius: 12,
+  backgroundColor: '#111',
+  width: '90%',
+  alignSelf: 'center',
+  marginBottom: 12,
+  borderColor: 'rgba(255, 0, 0, 0.15)',
+  borderWidth: 1,
+  shadowColor: '#ff0000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.15,
+  shadowRadius: 12,
+  elevation: 6,
                 
         },
         SubtitleStyleContainer:{
-            flexDirection:'row',
-            alignItems:'flex-start',
-            justifyContent:'flex-start',
-           
-           
-            marginTop:5,
-            gap:5,
-            padding:5,
-            width:'90%',
-            alignSelf:'center',
-            borderColor:'rgba(255, 0, 0, 0.5)',
-            borderWidth:1,
+          fontSize: 12, // ← de 8 a 12
+          color: '#aaaaaa',
+          letterSpacing: 1,
+            fontWeight: 'bold',
         },
         SubtitleStyle:{
-            fontSize:8,
-           fontFamily:'Helvetica',
-            color:'#ffffff',
-            letterSpacing:1,
-            fontWeight:'bold',
+              fontSize: 10, // ← de 8 a 12
+             alignItems: 'center',
+               justifyContent: 'center',
+           marginTop: 8,
+            width: '90%',
+           alignSelf: 'center',
+         borderWidth: 0, // ←
+            color: '#aaaaaa',
+          letterSpacing: 1,
+         fontWeight: 'bold',
 
 
         }

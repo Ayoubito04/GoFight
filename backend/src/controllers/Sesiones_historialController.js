@@ -41,7 +41,7 @@ const RegistrarHistorial=async(req,res)=>{
                 }
             const CalcularCalorias=rutina.rutinas_ejercicios.reduce((total,re)=>{
                  const categoria=re.ejercicios.categoria;//La categoría también es imprtante,ya que para cada categoria se asigna unos minutos
-                 const duracion=re.duracion_ejercicio;//Obtenemos la duracion de cada ejercicio
+                 const duracion=re.duracion_ejercicio/60;//Obtenemos la duracion de cada ejercicio
                  const calorias=CALORIAS_POR_CATEGORIA[categoria] || 0;//Si la categoría no se encuentra en el objeto CALORIAS_POR_CATEGORIA.le asignamos 0 por defect0
                  return total + (calorias * duracion);//Calculamos el total de calorias,teniendo en cuenta la duración * calorias
                  //Tenemos en cuenta que el total de calorias se va acumulando a medida

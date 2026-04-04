@@ -303,17 +303,17 @@ export const getEjerciciosDeRutina=async(rutinaId)=>{
     }
 }
 
-export const registrarSesionHistorial=async(rutinaId,caloriasQuemadas)=>{
+export const registrarSesionHistorial=async(rutinaId)=>{
       //Para guardar cada una de las sesiones en el historial se va a tener en cuenta varias codsas,elo id de la rutina y las calorias que va a quemar el usuario en esa rutina
       try{
           const token=await AsyncStorage.getItem('token');
           //Obtenemos el token del usuariologeado para poder registrar la sesión en el historial
-          const res=await fetch(`${BASE_URL}/sesiones_historial/registrar_sesion`,{
+          const res=await fetch(`${BASE_URL}/sesiones_historial/registrar_historial`,{
            //Eligimos el metodo de tipo POST,para poder registrar la sesión en el historial
            method:'POST',
            headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
            },
-           body:JSON.stringify({rutinaId,caloriasQuemadas})//Pasamos el id de la rutina y las calorias quemadas a json para poder enviarlo bien a la base de datos
+           body:JSON.stringify({id_rutina: rutinaId})//Pasamos el id de la rutina y las calorias quemadas a json para poder enviarlo bien a la base de datos
            //Lo transformamos a json
 
         }
