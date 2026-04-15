@@ -329,4 +329,25 @@ export const registrarSesionHistorial=async(rutinaId)=>{
             throw error;
       }
 }
+export const getAllUsers=async()=>{
+    //Vamos a obtener todos los usuarios,para que el administrador pueda gestionarlos
+    try{
+        const token=await AsyncStorage.getItem('token');
+        const res=await fetch(`${BASE_URL}/auth/panel_usuarios`,{
+            headers:{'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            }
+        });
+        const text=await res.text();
+        console.log('Respuesta del servidor al obtener todos los usuarios:',text);
+        const data=JSON.parse(text);
+        if(!res.ok){
+            throw new Error(data.message || `Error al obtener todos los usuarios ${error.message}`);
+        }
+        return data.getAllUsuarios || [];
+        //Esto nos devolverá la lista de todos los usuarios,para que el administrador pueda gestionarlos
+    }catch(error){
+        throw error;
+
+    }
+}
 

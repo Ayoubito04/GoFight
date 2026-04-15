@@ -12,14 +12,24 @@ import { getGamificaciones,ActualizarGamificaciones } from '../services/services
 import StackContainer from '../components/StackContainer';
 import BarraProgreso from '../components/BarraProgreso';
 import { getTotalCaloriasQuemadas } from '../services/services';
+//Vamos a implementar en el home un boton para poder ver ese panel de usuarios y poder eliminnar el usuario y poder darle acceso como administrador
+import { getUserProfile } from '../services/services';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+//Para eso importamos el servicio para obtener usuarios,ya que necsitamos obtener el rol del usuario,que nos tendría que dar acceso a ese panel
+
 
 
 
 const Home=()=>{
+    const navigation = useNavigation();
     //Vamos a implementar la pantalla de inicio,que va a ser básica y muy snecilla
      const [loading,setLoading]=useState(true);
      const [gamificaciones,setGamificaciones]=useState(null);//Traemos las gamificaciones
      const [caloriasQuemadas,setCaloriasQuemadas]=useState(0);
+     //Definimos el estado del administrador,que va a ser booleano 
+     const [isAdmin,setIsAdmin]=useState(false);
+     
      useEffect(()=>{
         //Aquí vamos a simular la pantalla de carga
         setTimeout(async ()=>{
@@ -27,6 +37,15 @@ const Home=()=>{
               try{
                  await ActualizarGamificaciones();//Actualizamos las gamificaciones cada vez que se registre una sesión en el historial,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
                 const res=await ActualizarGamificaciones();
+                const perfil=await getUserProfile();
+                console.log('Perfil del usuario obtenido en Home:', perfil);
+                const rolUsuario=perfil?.perfilUsuario?.rol=='admin';
+                setIsAdmin(rolUsuario);
+                //El usuario es admin si el rol obtenido del perfil es 'admin',de lo contrario,es false
+
+
+                //Obtenemos el perfil del usuario
+
                 console.log('Respuesta de actualizar gamificaciones:', res);
                 const calHoy=await  parseInt(res.caloriasQuemadas,10) || 0;
                      setCaloriasQuemadas(calHoy);
@@ -65,6 +84,14 @@ const Home=()=>{
                       <ScrollView>
                           <StackContainer datos={gamificaciones}/>
                               <BarraProgreso caloriasActuales={caloriasQuemadas} caloriasObjetivo={300}/>
+                              {
+                                   isAdmin && (
+                                        <View style={{marginTop:20,alignItems:'center', flexDirection:'row', justifyContent:'center'}}>
+                                             <Button title="Panel de administración" onPress={()=>navigation.navigate('GestorUsuariosAdmin')}/>
+                                      
+                                        </View>
+                                   )
+                              }
                       </ScrollView>
                       
                      <Footer/>

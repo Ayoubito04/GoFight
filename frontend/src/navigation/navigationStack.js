@@ -7,6 +7,7 @@ import Home from '../screens/Home';//importamos la pantalla de inicio
 import Rutinas from '../screens/Rutinas';//importamos la pantalla de rutinas
 import Ejercicios from '../screens/ejercicios';//importamos la pantalla de ejercicios
 import Perfil from '../screens/Perfil';//importamos la pantalla de perfil
+import GestorUsuariosAdmin from '../screens/GestorUsuariosAdmin';//importamos la pantalla de gestor de usuarios,que es el panel de administración,que solo puede acceder el admin,para poder ver a todos los usuarios,eliminar usuarios y transformar usuarios en admin
 //Vale ccon eso ya podremos definir el contendor de navegación
 //Vamos a definir las pantallas de navegación
 
@@ -22,6 +23,7 @@ const NavigationStack=()=>{
                 <Stack.Screen name='Rutinas' component={Rutinas} options={{headerShown:false}}/>
                 <Stack.Screen name='Ejercicios' component={Ejercicios} options={{headerShown:false}}/>
                 <Stack.Screen name='Perfil' component={Perfil} options={{headerShown:false}}/>
+                <Stack.Screen name='GestorUsuariosAdmin' component={GestorUsuariosAdmin} options={{headerShown:false}}/>
             </Stack.Navigator>
         </NavigationContainer>
     )
