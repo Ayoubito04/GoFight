@@ -350,4 +350,74 @@ export const getAllUsers=async()=>{
 
     }
 }
-
+//------Operaciones del administrador sobre los usuarios------//
+export const makeAdmin=async(id_usuario)=>{
+    //Esta función es para transformar a un usuario en admin,solo el admin puede hacer esto,por lo tanto,es importante que esta función esté protegida por el middleware de autenticación y autorización,para que solo el admin pueda acceder a ella
+    try{
+        const token=await AsyncStorage.getItem('token');
+        const res=await fetch(`${BASE_URL}/auth/make_admin`,{
+            method:'PUT',
+            headers:{'Content-Type':'application/json',
+            'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            },
+            body:JSON.stringify({id_usuario})//Pasamos el id del usuario que queremos transformar a admin a json para poder enviarlo bien a la base de datos
+        });
+        const text=await res.text();
+        console.log('Respuesta del servidor al transformar a un usuario en admin:',text);
+        const data=JSON.parse(text);
+        if(!res.ok){
+            throw new Error(data.message || `Error al transformar a un usuario en admin ${error.message}`);
+        }
+        return data.UserToAdmin || {};
+        //Esto nos devolverá la información del usuario que hemos transformado a admin,para que el administrador pueda ver que se ha transformado correctamente
+    }
+    catch(error){
+        throw error;
+    }
+}
+export const deleteUserById=async(id_usuario)=>{
+    //Esta función es para eliminar a un usuario por su id,solo el admin puede hacer esto,por lo tanto,es importante que esta función esté protegida por el middleware de autenticación y autorización,para que solo el admin pueda acceder a ella,esta función es de emergencia,por ejemplo si un usuario está causando problemas en la plataforma,el admin podrá borrarlo sin necesidad de iniciar sesión
+    try{
+        const token=await AsyncStorage.getItem('token');
+        const res=await fetch(`${BASE_URL}/auth/delete_user_by_id/${id_usuario}`,{
+            method:'DELETE',
+            headers:{'Content-Type':'application/json',
+            'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            },
+            
+        });
+        const text=await res.text();
+        console.log('Respuesta del servidor al eliminar a un usuario:',text);
+        const data=JSON.parse(text);
+        if(!res.ok){
+            throw new Error(data.message || `Error al eliminar a un usuario ${error.message}`);
+        }
+        return data.UserDeleted || {};
+        //Esto nos devolverá la información del usuario que hemos eliminado,para que el administrador pueda ver que se ha eliminado correctamente
+    }catch(error){
+        throw error;
+    }
+}
+export const ActualizarUsuarioAdmin=async(id_usuario,nombre,email,rol)=>{
+    //Esta función es para actualizar a un usuario por su id,solo el admin puede hacer esto,por lo tanto,es importante que esta función esté protegida por el middleware de autenticación y autorización,para que solo el admin pueda acceder a ella
+    try{
+        const token=await AsyncStorage.getItem('token');
+        const res=await fetch(`${BASE_URL}/auth/actualizar_usuario_admin`,{
+            method:'PUT',
+            headers:{'Content-Type':'application/json',
+            'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            },
+            body:JSON.stringify({id_usuario,nombre,email,rol})//Pasamos el id del usuario que queremos actualizar a json para poder enviarlo bien a la base de datos
+        });
+        const text=await res.text();
+        console.log('Respuesta del servidor al actualizar a un usuario:',text);
+        const data=JSON.parse(text);
+        if(!res.ok){
+            throw new Error(data.message || `Error al actualizar a un usuario ${error.message}`);
+        }
+        return data.UserUpdated || {};
+        //Esto nos devolverá la información del usuario que hemos actualizado,para que el administrador pueda ver que se ha actualizado correctamente
+    }catch(error){
+        throw error;
+    }
+}

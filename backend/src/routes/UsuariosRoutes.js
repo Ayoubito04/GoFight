@@ -15,4 +15,5 @@ router.get('/panel_usuarios',authMiddleware,UsuariosController.getAllUsuarios);/
 router.put('/make_admin',authMiddleware,UsuariosController.MakeAdmin);//Solo el admin puede transformar a un usuario en admin
 router.delete('/delete_user_by_id/:id',authMiddleware,UsuariosController.DeleteUserById);//Solo el admin puede eliminar a un usuario por su id,esta función es de emergencia,por ejemplo si un usuario está causando problemas en la plataforma,el admin podrá borrarlo sin necesidad de iniciar sesión
 router.get('/ver_perfil_usuario',authMiddleware,UsuariosController.VerPerfilUsuario);//Definimos la ruta para ver el perfil de un usuario por su id,esta función es propia del administrador,ya que el admin puede ver el perfil de cualquier usuario,pero los usuarios normales solo pueden ver su propio perfil,que es la función siguiente
+router.put('/actualizar_usuario_admin', authMiddleware, UsuariosController.ActualizarUsuarioAdmin);
 module.exports=router;//Exportamos el router,para poder usarlo en el archivo index.js,que es el archivo principal de nuestro servidor

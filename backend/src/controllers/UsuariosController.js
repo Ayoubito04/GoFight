@@ -108,9 +108,9 @@ const DeleteUserById=async(req,res)=>{
     }
     else{
         try{
-         const {id_usuario}=req.body;
+         const id=parseInt(req.params.id);//Esto nos permite obtener el token del usuario,en vez del id númerico,lo cual es una ventaja de seguridad
          const DeleteUser=await prisma.usuarios.delete({
-                where:{id_usuario:id_usuario}
+                where:{id_usuario:id}
 
          })
          res.status(200).json({message:'Usuario eliminado exitosamente',DeleteUser});
@@ -136,5 +136,30 @@ const VerPerfilUsuario=async(req,res)=>{
         res.status(500).json({message:'Error al obtener el perfil del usuario',error:error.message});
     }
 }
+const ActualizarUsuarioAdmin=async(req,res)=>{
+    //Edsta función es para que el admin pueda actualizar el usuario de culquier usuario,es decir,el admin puede actualizar el nombre,email,contraseña y rol de cualquier usuario,ya que es una función propia del administrador
+    try{
+        if(req.user.rol!=='admin'){
+            return res.status(403).json({message:'No tienes permisos para realizar esta acción'});
+           
+    }
+     const {id_usuario,name,email,password,rol}=req.body;//Recibimos los datos que queremos actualizar desde el cliente
+     let contraseña;
+     if(password){
+        const salt=await bcrypt.genSalt(10);
+        contraseña=await bcrypt.hash(password,salt);
+        //Con esto encriptamos la contraseña,para que no se guarde en texto plano en la base de datos,lo cual es un gran riesgo de seguridad
+     }
+            const usuario=await prisma.usuarios.update({
+                where:{id_usuario:parseInt(id_usuario)},//Ponemos la condición,es decir buscará al usuario por su id
+                data:{nombre:name,email:email,contrasena:contraseña || undefined,rol:rol},
+                select:{id_usuario:true,nombre:true,email:true,rol:true}
+            })
+            res.status(200).json({message:'Usuario actualizado exitosamente por el admin',usuario});
 
-module.exports={ActualizarUsuario,EliminarTodosUsuarios,getAllUsuarios,MakeAdmin,DeleteUserById,VerPerfilUsuario};//Exportamos las funciones de getUsuario,EliminarUsuario y ActualizarUsuario,para poder usarlas en el archivo UsuariosRoutes.js,que es donde vamos a definir las rutas de usuarios
+    }catch(error){
+        res.status(500).json({message:'Error al actualizar el usuario',error:error.message});
+    }
+}
+
+module.exports={ActualizarUsuario,EliminarTodosUsuarios,getAllUsuarios,MakeAdmin,DeleteUserById,VerPerfilUsuario,ActualizarUsuarioAdmin};//Exportamos las funciones de getUsuario,EliminarUsuario y ActualizarUsuario,para poder usarlas en el archivo UsuariosRoutes.js,que es donde vamos a definir las rutas de usuarios
