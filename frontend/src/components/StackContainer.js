@@ -96,7 +96,7 @@ const StackContainer=()=>{
                                         <FontAwesome name="list" size={24} color="#ffffff" style={style.Icon}/>
                                 </View>
                                     <View>
-                                            <Button title="ver rutinas" onPress={() => {}}></Button>
+                                            <Button title="ver rutinas" onPress={() => navigation.navigate('MisRutinas')}></Button>
                                 </View>
                                   
                             </View>

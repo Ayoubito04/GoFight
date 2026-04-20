@@ -445,8 +445,21 @@ export const getRanking=async()=>{
 }
 //------Crear rutinas-----//
 //-----Este ya es el ultimo servicio que vamos a crear y está enfocado en la creación de rutinas por parte del usuario/administrador,ya que el administrador puede crear rutinas para que los usuarios puedan elegirlas,por lo tanto,es importante que esta función esté protegida por el middleware de autenticación y autorización,para que solo el admin pueda acceder a ella
-export const crearRutina=async(nombre,dificultad,ejercicios)=>{
+export const crearRutina=async(nombre_rutina,ejercicios)=>{
     try{
+        const token=await AsyncStorage.getItem('token');
+        const res=await fetch(`${BASE_URL}/rutinas/crear_rutina`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json',
+            'Authorization':`Bearer ${token}`//Pasamos el token de autenticación en los headers,para poder acceder a las rutas protegidas de la API
+            },
+            body:JSON.stringify({nombre_rutina,ejercicios})//Pasamos el nombre, la dificultad y los ejercicios de la rutina a json para poder enviarlo bien a la base de datos
+        });
+        const text=await res.text();
+        console.log('Respuesta del servidor al crear una rutina:',text);
+        const data=JSON.parse(text);
+        return data.nuevaRutina || {};
+        //Esto nos devolverá la información de la rutina que hemos creado,para que el administrador pueda ver que se ha creado correctamente
 
     }catch(err){
         throw err;
