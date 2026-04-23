@@ -2,149 +2,109 @@
 //Vamos a empezar con el CRUD de las gamificaciones
 const prisma=require('../db/db');//Treamos la base de datos,para poder hacer las operaciones CRUD
 
-const ActualizarGamificaciones=async(req,res)=>{
-    //En vez de crear gamificaciones,solo ls vamos a actualizar,ya que la racha y el ranking son por defecto =0
-    //Tenemos que tener el cuenta la fecha actual,ya que la racha se tiene que actualizar cada día
-    const hoy=new Date();//Obtenemos la fecha actual,para poder comparar con las fechas de las sesiones de entrenamiento,teniendo en cuenta que las sesiones de entrenamiento que se han registrado desde el inicio del día hasta el final del día,serán las sesiones de hoy
-    hoy.setHours(0,0,0,0);//Establecemos la hora a 00:00:00 para comparar solo la fecha
-    const manana=new Date(hoy);
-    manana.setDate(hoy.getDate()+1);//Obtenemos la fecha de mañana,para poder comparar con las fechas de las sesiones de entrenamiento,teniendo en cuenta que las sesiones de entrenamiento que se han registrado desde el inicio del día hasta el final del día,serán las sesiones de hoy
-   
-    const ayer=new Date(hoy);
-    ayer.setDate(hoy.getDate()-1);//Obtenemos la fecha de ayer restando un día,esto es para que la app,tenga en cuenta cuantos días estan pasando verdaderamente
-    //La lógica es simple,si el usuario ha entrenado hoy,la racha se mantiene,incluso va incrementando poco a poco,si no mantiene varios días sin entrenar la tecnica,pues perderá toda esa racha
-    try{
-        const ultimaSesion=await prisma.sesiones_historial.findFirst({
-            where:{id_usuario:req.user?.id,
-                 
-            },
-            orderBy:{
-                fecha_entreno:'desc'
+const ActualizarGamificaciones = async (req, res) => {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const manana = new Date(hoy);
+    manana.setDate(hoy.getDate() + 1);
+    const ayer = new Date(hoy);
+    ayer.setDate(hoy.getDate() - 1);
 
-            }
-        })
-                //La lógica Date tiene en cuenta la fecha y hora actual y este valor se resta a la fecha de ayer
-        const  sumCalorias=await prisma.sesiones_historial.aggregate({
-            _sum:{calorias:true},
-            where:{
-                id_usuario:req.user?.id,
-                fecha_entreno:{
-                    gte:hoy,
-                    lt: manana
-                }
-            }
-        })
-     
-        const sesionesHoy=await prisma.sesiones_historial.findMany({
-            where:{
-                id_usuario:req.user?.id,
-                fecha_entreno:{
-                    gte:hoy,
-                    lt: manana
-                }
-            }
-        })
-        //Aquí vamos a poner un filtro,para que solo se muestren las sesiones de hoy,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
-        const totalSesiones=sesionesHoy.length;
-        //Medimos la longitud de las sesiones de hoy,para mostrar el total de sesiones completadas hoy,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
-        console.log('Sesiones registradas hoy:', sesionesHoy);
-        const totalCaloriasQuemadas=sumCalorias._sum.calorias || 0;
-        //Aquí se calculan total de calorias quemadas hoy
-        let gamificaciones=await prisma.gamificaciones.findFirst({
-            where:{id_usuario:req.user?.id}
+    try {
+        const id_usuario = req.user?.id;
+        //Primero de todo obtenemos el id del usuario desde el token de autenticación,ya que las gamificaciones depebnden del perfil del usuario,así que necesitamos el id para poder obtener las gamificaciones del usuario y actualizarlas
+        // 1. Consultas a la base de datos
+        const ultimaSesion = await prisma.sesiones_historial.findFirst({
+            where: { id_usuario },
+            orderBy: { fecha_entreno: 'desc' }
         });
-        //Tenemos en cuenta que el usuario pierda la racha,una vez que se actualice
-        if(!gamificaciones){
-            gamificaciones=await prisma.gamificaciones.create({
-                data:{
-                    id_usuario:req.user?.id,
-                    racha_dias:0,
-                    puntos_ranking:0
+        //Tenemos en cuenta la ultima sesión del usurio y lo ordenamos de manera descendente
 
-                    
-                }
-                
-            })
-           
+        const sumCalorias = await prisma.sesiones_historial.aggregate({
+            _sum: { calorias: true },
+            where: { id_usuario, fecha_entreno: { gte: hoy, lt: manana } }
+        });
+        //Obtenemos la suma de las calorias quemadas en el día,para poder dar puntos de bonus al usuario,teniendo en cuenta las caloiras perdidas de hoy y mañanan,es decir el rango es de unas 24 horas,si no se registra ninguna rutina dentro de ese rango establecido pues no se tendrán en cuenta esas calorias
 
+        const sesionesHoy = await prisma.sesiones_historial.findMany({
+            where: { id_usuario, fecha_entreno: { gte: hoy, lt: manana } }
+        });
+        //Obtenemos las sesiones de hoy,con el mismo filtro que antes(es decir sesiones registradas dentro de un rango establecido de 24 horas)
 
-    }
-    if(ultimaSesion){
-        const fechaUltimaSesion=new Date(ultimaSesion.fecha_entreno);
-        fechaUltimaSesion.setHours(0,0,0,0);//Establecemos la hora a 00:00:00 para comparar solo la fecha
-        if(fechaUltimaSesion.getTime()===hoy.getTime() && gamificaciones.racha_dias>0){
-            //Si el usuario ha entrenado hoy,la racha se mantiene,incluso va incrementando poco a poco
-            return res.status(200).json({
-                message:"Ya has actualizado la racha de hoy,no puedes actaulizarla hasta mañana,pero no te preocupes,que seguro que superas a mi abuela,que se note que eres un/a crack",
-                gamificaciones,
-                caloriasQuemadas:totalCaloriasQuemadas
-            })
+        let gamificaciones = await prisma.gamificaciones.findFirst({
+            where: { id_usuario }
+        });
+        //Obtenemos las gamificaciones del usuario,el usuario target es el mismo que el de las sesiones.En la carpeta de services/services.js se pulle más está funcionalidad,dónde tendrá que obtener el token antes de realizar acciones en la app en especifico
+
+        if (!gamificaciones) {
+            gamificaciones = await prisma.gamificaciones.create({
+                data: { id_usuario, racha_dias: 0, puntos_ranking: 0 }
+            });
         }
-    }
+        //Si el usuario no tiene gamificaciones,se crearan unas gamificaciones de manera automatica,con una racha de días 0 y puntos 0
+        //Decxlaramos variables para cada uno de los atributos de las gamificaciones,aparte de los mensajes que recibirá el usuario
+        let racha_dias = gamificaciones.racha_dias;
+        let puntos_ranking = gamificaciones.puntos_ranking;
+        let mensajeResponse = ''; // Usamos un nombre claro
+        const totalCaloriasQuemadas = sumCalorias._sum.calorias || 0;
 
-    //Sin el usuario no tiene gamificaciones,lo creamos con una racha de 0 días y 0 puntos
-     let racha_dias=gamificaciones.racha_dias;
-        let puntos_ranking=gamificaciones.puntos_ranking;
-        let racha_perdida=false;
-        let mensaje='';
-        if(!ultimaSesion){
-            racha_dias=0;
-            racha_perdida=true;
-            puntos_ranking=Math.max(0,puntos_ranking-10);//El usuario pierde 10 puntos de ranking,una vez que se actualize
-            mensaje='No has entrenado hoy,has perdido tu racha de días consecutivos,como se nota que mi abuela pega más que tu,anda campeon/a,espabila....'
-           
-
-        }
-        else{
-              const fechaUltimaSesion=new Date(ultimaSesion.fecha_entreno);
-              fechaUltimaSesion.setHours(0,0,0,0);//Establecemos la hora a 00:00:00
-              if(fechaUltimaSesion.getTime()===hoy.getTime()){
-                mensaje='Dale duro,que seguro que superas a mi abuela,por hoy has restablecido la racha'
-                racha_dias+=1;
-                puntos_ranking+=10;
-                   
-
-                
-
-        }
-        else if(fechaUltimaSesion.getTime()===ayer.getTime()){
-            racha_dias+=1;
-            puntos_ranking+=10;
-            mensaje=`Muy bien,has mantenido tu racha de ${racha_dias} días consecutivos,que se note que eres un/a crack,mi abuela estaría orgullosa de ti`
-            
         
-}
-else{
-    racha_dias=0;
-    racha_perdida=true;
-    puntos_ranking=Math.max(0,puntos_ranking-10);
-    mensaje='Has perdido tu racha de días consecutivos,como se nota que mi abuela pega más,eres un/a vago/a,anda campeon/a,espabila,que la vida son dos días...'
-}
-if(totalCaloriasQuemadas>=1000){
-     puntos_ranking+=20;
-     mensaje=`Enhorabuena,has quemado ${totalCaloriasQuemadas} calorías hoy,te has ganado 20 puntos de ranking,que se note que eres un/a crack,mi abuela estaría orgullosa de ti`
-}
-if(sesionesHoy.length>=3){
-     puntos_ranking+=20;
-     mensaje=`Enhorabuena,has completado ${sesionesHoy.length} sesiones hoy,te has ganado 20 puntos de ranking,que se note que eres un/a crack,mi abuela estaría orgullosa de ti`
-}
-  //Ahora sí que lo actualizamos en la base de datos,con la nueva racha y puntos de ranking
-     
-}
- const gamificacionesActualizadas=await prisma.gamificaciones.update({
-        where:{id_gamificacion:gamificaciones.id_gamificacion},
-        data:{
-            racha_dias:racha_dias,
-            puntos_ranking:puntos_ranking
-        }
-        //Ahora toca avisar al usuario de su neuva racha
+        if (!ultimaSesion) {
+            racha_dias = 0;
+            mensajeResponse = '¡Bienvenido! Entrena hoy para activar tu racha.';
+            //Si no hay sesiones registradas en las ultimas 24 horas,entonces las rachas==0
+        } else {
+            const fechaUltima = new Date(ultimaSesion.fecha_entreno);
+            fechaUltima.setHours(0, 0, 0, 0);
 
-      });
-      res.status(200).json({message:mensaje, gamificaciones:gamificacionesActualizadas,caloriasQuemadas:totalCaloriasQuemadas});
-}catch(error){
-    res.status(500).json({message:'Error al actualizar las gamificaciones',error:error.message});
-}
-}
+            if (fechaUltima.getTime() === hoy.getTime()) {
+                // Ya entrenó hoy: mantenemos racha pero actualizamos mensaje
+                mensajeResponse = 'Dale duro, que seguro que superas a mi abuela.';
+            } else if (fechaUltima.getTime() === ayer.getTime()) {
+                //Si ayer sí que entreno y además su sesión está registrada dentro de ese intervalo de 24 horas,pues aumentaremos la gamificaciones,ya sean puntos ranking e incluso esto influye en el mensaje
+                racha_dias += 1;
+                puntos_ranking += 10;
+                mensajeResponse = `¡Crack! Has mantenido tu racha de ${racha_dias} días.`;
+            } else {
+                // Si han pasado más de 2 días sin entrenar,se pierde esta racha,es decir,si no se registra ninguna sesión dentro de un rango establecido de 48 horas,entonces se pierde la racha,y además afecta a los puntos del ranking
+                puntos_ranking = Math.max(0, puntos_ranking - 10);
+                mensajeResponse = 'Has perdido tu racha por vago/a. Mi abuela pega más fuerte.';
+            }
+        }
+
+       //Aquí definimos otra bonificaciones,dónde se recompensa por sesiones registradas dentro de un rango establecido de 24 horas
+        if (totalCaloriasQuemadas >= 10) {
+            puntos_ranking += 20;
+            mensajeResponse += ` | +20 pts por quemar ${totalCaloriasQuemadas} kcal.`;
+        }
+
+        if (sesionesHoy.length >= 3) {
+            puntos_ranking += 20;
+            mensajeResponse += ` | +20 pts por completar 3 sesiones.`;
+        }
+
+        // Finalmente,actualizaremos las gamificaciones del usuario con los nuevos valores calculados,teniendo en cuenta la racha de días y los puntos del ranking,que se actualizan dependiendo de las sesiones registradas dentro de un rango establecido de 24 horas,así como la ultima sesión registrada dentro de ese mismo rango establecido de 24 horas
+        const gamificacionesActualizadas = await prisma.gamificaciones.update({
+            where: { id_gamificacion: gamificaciones.id_gamificacion },
+            data: {
+                racha_dias: racha_dias,
+                puntos_ranking: puntos_ranking
+            }
+        });
+
+
+        //Finalmente la respuyesta por parte del servidor,que incluye un mensaje claro para el usuario,así como las gamificaciones actualizadas y las calorias quemadas en el día,que también influyen en las bonificaciones de las gamificaciones
+        res.status(200).json({
+            message: mensajeResponse,
+            gamificaciones: gamificacionesActualizadas,
+            caloriasQuemadas: totalCaloriasQuemadas
+        });
+
+    } catch (error) {
+        console.error("Error en gamificaciones:", error);
+        res.status(500).json({ message: 'Error al actualizar', error: error.message });
+    }
+};
 const VerGamificaciones=async(req,res)=>{
       const id_usuario=req.user?.id;
       console.log('ID del usuario desde VerGamificaciones:', id_usuario); // Agrega este console.log para verificar el ID del usuario

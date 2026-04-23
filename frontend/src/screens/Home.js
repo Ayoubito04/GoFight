@@ -1,6 +1,6 @@
 //Aquí vamos a implementar la pantalla de incio
 //Vamos a implementar cada uno de los componentes que vamos a utilizar en la pantalla de inicio
-import React from 'react';
+import React, { act } from 'react';
 import {View,Text,StyleSheet,ActivityIndicator, ScrollView} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {useState,useEffect} from 'react';
@@ -23,6 +23,7 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 
 const Home=()=>{
+     let gamificacionesActualizadas=false;//Definimos una variable para controlar si las gamificaciones se han actualizado
     const navigation = useNavigation();
     //Vamos a implementar la pantalla de inicio,que va a ser básica y muy snecilla
      const [loading,setLoading]=useState(true);
@@ -31,34 +32,28 @@ const Home=()=>{
      //Definimos el estado del administrador,que va a ser booleano 
      const [isAdmin,setIsAdmin]=useState(false);
      
+     let actualizarGamificacionesEjecutada=false;//Definimos una variable para controlar si la función de actualizar gamificaciones se ha ejecutado,para evitar que se ejecute varias veces,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
      useEffect(()=>{
         //Aquí vamos a simular la pantalla de carga
         setTimeout(async ()=>{
              
               try{
-                   
-                const perfil=await getUserProfile();
-                console.log('Perfil del usuario obtenido en Home:', perfil);
-                const res=await getGamificaciones();
-                setGamificaciones(res);
-                const rolUsuario=perfil?.perfilUsuario?.rol=='admin';
-                setIsAdmin(rolUsuario);
-                //El usuario es admin si el rol obtenido del perfil es 'admin',de lo contrario,es false
-
-
-                //Obtenemos el perfil del usuario
-
-                console.log('Respuesta de actualizar gamificaciones:', res);
-                const calHoy=await  getTotalCaloriasQuemadas();
-                     setCaloriasQuemadas(calHoy);
-                    console.log('Calorías quemadas hoy obtenidas de la respuesta de actualizar gamificaciones:', calHoy);
+                   const perfil=await getUserProfile();
+                   setIsAdmin(perfil.perfilUsuario?.rol === 'admin');//Si el rol del usuario es admin,entonces le damos acceso al panel de administración
+                    console.log('Perfil del usuario:', perfil); // Agrega este console.log para verificar el perfil del usuario
+                    
+                    if (actualizacion && actualizacion.gamificaciones) {
+                // Seteamos los datos que vienen directamente de la actualización
+                    setGamificaciones(actualizacion.gamificaciones);
                 
-             
-             
-             
-                 const data=await getGamificaciones();//Obtenemos las gamificaciones mediante un await
-                setGamificaciones(data);
-                
+                // Si el server devuelve las calorías, las usamos, si no, llamamos al servicio
+                if (actualizacion.caloriasQuemadas !== undefined) {
+                    setCaloriasQuemadas(actualizacion.caloriasQuemadas);
+                } else {
+                    const calHoy = await getTotalCaloriasQuemadas();
+                    setCaloriasQuemadas(calHoy);
+                }
+            }
 
               }catch(error){
                   console.log('Error al actualizar las gamificaciones:', error);
