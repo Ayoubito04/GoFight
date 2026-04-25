@@ -12,6 +12,7 @@ import { Ionicons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icon
 import { getUserProfile, getGamificaciones } from '../services/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../components/Footer';
+import { Image } from 'react-native';
 
 const Perfil = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
@@ -61,11 +62,18 @@ const Perfil = ({ navigation }) => {
 
                 {/* Header de perfil */}
                 <View style={styles.ProfileHeader}>
-                    <View style={styles.AvatarWrapper}>
-                        <Ionicons name="person-circle" size={90} color="#FF2233" />
-                    </View>
+                  <View style={styles.AvatarWrapper}>
+  {perfil?.perfilUsuario?.perfil ? (
+    <Image
+      source={{ uri: perfil.perfilUsuario.perfil }}
+      style={styles.AvatarImage}
+    />
+  ) : (
+    <Ionicons name="person-circle" size={90} color="#FF2233" />
+  )}
+</View>
                     <Text style={styles.NombreText}>{nombre}</Text>
-                    <Text style={styles.TipoText}>{tipoPerfil.toUpperCase()}</Text>
+                    
                 </View>
 
                 {/* Info personal */}
@@ -83,7 +91,7 @@ const Perfil = ({ navigation }) => {
                     <View style={styles.InfoRow}>
                         <MaterialCommunityIcons name="account-outline" size={20} color="#FF2233" />
                         <Text style={styles.InfoLabel}>Perfil</Text>
-                        <Text style={styles.InfoValue}>{tipoPerfil}</Text>
+                      
                     </View>
                 </View>
 
@@ -287,6 +295,13 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
         fontFamily: 'Helvetica',
     },
+    AvatarImage: {
+  width: 90,
+  height: 90,
+  borderRadius: 45,
+  borderWidth: 2,
+  borderColor: '#FF2233',
+},
 });
 
 export default Perfil;

@@ -35,46 +35,41 @@ const Home=()=>{
      const [isAdmin,setIsAdmin]=useState(false);
      
      let actualizarGamificacionesEjecutada=false;//Definimos una variable para controlar si la función de actualizar gamificaciones se ha ejecutado,para evitar que se ejecute varias veces,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
-     useEffect(()=>{
-        //Aquí vamos a simular la pantalla de carga
-        setTimeout(async ()=>{
-             
-              try{
-                   const perfil=await getUserProfile();
-                   setIsAdmin(perfil.perfilUsuario?.rol === 'admin');//Si el rol del usuario es admin,entonces le damos acceso al panel de administración
-                    console.log('Perfil del usuario:', perfil); // Agrega este console.log para verificar el perfil del usuario
-                    
-                const actualizacion = await ActualizarGamificaciones();
-                 if(actualizacion && actualizacion.success){   
-                // Si el server devuelve las calorías, las usamos, si no, llamamos al servicio
-                if (actualizacion.caloriasQuemadas !== undefined) {
-                    setCaloriasQuemadas(actualizacion.caloriasQuemadas);
-                } else {
-                    const calHoy = await getTotalCaloriasQuemadas();
-                    setCaloriasQuemadas(calHoy);
-                }
+   useEffect(() => {
+    const InicializarHome = async () => {
+        // Bloqueo por referencia para evitar doble ejecución al montar
+        if (isUpdateGamificacionesRunning.current) return;
+        isUpdateGamificacionesRunning.current = true;
+
+        try {
+            // 1. Cargamos el perfil (para el rol de admin)
+            const perfil = await getUserProfile();
+            if (perfil) {
+                setIsAdmin(perfil.perfilUsuario?.rol === 'admin');
             }
-            else{
-                //En el caso de que no actualize las gamificaciones,entonces llamamos al servicio de obtener gamificaciones,para obtener las gamificaciones del usuario,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
-                const gamificacionesObtenidas=await getGamificaciones();
-                    setGamificaciones(gamificacionesObtenidas);
 
-            }
-            isUpdateGamificacionesRunning.current = false; // Reiniciamos el flag después de la actualización
-            //Aquí reinciamos el flag,es decir solo se actualizará una sola vez
+            // 2. Traemos los datos de lectura (Práctico y seguro)
+            // Usamos Promise.all para que las dos peticiones se hagan a la vez y sea más rápido
+            const [gamificacionesObtenidas, calHoy] = await Promise.all([
+                getGamificaciones(),
+                getTotalCaloriasQuemadas()
+            ]);
 
-              }catch(error){
-                  console.log('Error al actualizar las gamificaciones:', error);
-              }
-              finally{
-                    setLoading(false);
-              }
+            // 3. Seteamos los estados con datos reales de la DB
+            setGamificaciones(gamificacionesObtenidas);
+            setCaloriasQuemadas(calHoy || 0);
 
+        } catch (error) {
+            console.log('Error al cargar datos del Home:', error);
+        } finally {
+            setLoading(false);
+            // IMPORTANTE: No reinicies el flag aquí si quieres que solo 
+            // ocurra una vez por sesión de carga del componente.
+        }
+    };
 
-                //Vamos a simular una carga de 2 segundos,para que se muestre la pantalla de carga,antes de mostrar la pantalla de inicio
-             //La función va esperar 2 segundos a que la carga termine
-        },2000);
-     },[]);
+    InicializarHome();
+}, []);
      if(loading){
          return(
                <View style={style.ActivityIndicatorStyle}>

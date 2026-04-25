@@ -11,7 +11,7 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
  
 // ─── Constantes de objetivos ──────────────────────────────────────────────────
 const CALORIAS_OBJETIVO = 300; // Meta diaria de calorías quemadas
-const SESIONES_OBJETIVO = 10;
+const SESIONES_OBJETIVO = 3;//Meta diaria de sesiones registradas debntro de un rango establecido de 24 horas
  
 // ─── Sub-componente: Stat compacto (ícono + número + etiqueta) ───────────────
 // Se usa en la fila superior para racha y puntos — dato visible de un vistazo

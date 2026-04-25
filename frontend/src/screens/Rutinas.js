@@ -47,9 +47,11 @@ const Rutinas=()=>{
                 setSearchRutina(text);
                 //Aquí vamos a filtrar las rutinas por su nombre y dificultad,para mostrar la pantalla de carga,antes de mostrar la pantalla de rutinas,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
                 const filtrarRutinas=rutinas.filter(rutina=>{
-                          const nombreMatch=rutina.nombre_rutina.toLowerCase().includes(text.toLowerCase());
-                          const dificultadMatch=rutina.dificultad.toLowerCase().includes(text.toLowerCase());
-                          return nombreMatch || dificultadMatch;
+        const nombre = (rutina.nombre_rutina || "").toLowerCase();
+        const dificultad = (rutina.dificultad || "").toLowerCase();
+        const busqueda = text.toLowerCase();
+
+        return nombre.includes(busqueda) || dificultad.includes(busqueda);
                 });
                 setRutinasFiltradas(filtrarRutinas);
         };
@@ -151,50 +153,47 @@ const Rutinas=()=>{
 }
 const styles=StyleSheet.create({
         Container:{
-                flex:1,
-                backgroundColor:'#000000',
-                paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+               flex: 1,
+        backgroundColor: '#050505', // Un negro más profundo para que resalten las cards
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
                 
 
         },
         flatListContent: {
-        paddingVertical: 2,
+         paddingVertical: 2,
+
         // Espacio extra para que el Footer no tape nada
+
         justifyContent: 'center',
+
         bottom: 0,
+
         paddingTop: 100,
 
+
+
        
-        
+
+       
+
         overflow:'scroll'
-
-
     },
        itemContainer: {
-    backgroundColor: '#1e1e1e', 
-    padding: 20,
-    marginVertical: 8,         
-    marginHorizontal: 20,      
-    borderRadius: 15,           
-    width: '90%',               
-    paddingHorizontal: 25,
-    paddingVertical: 15,
-    overflow: 'hidden',
-    borderLeftColor: '#ff0000',
-
-    
-    borderLeftWidth: 5,
-
-    
-   
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    
-    
-    elevation: 8,
-    alignSelf:'stretch'
+  backgroundColor: '#121212', // Gris oscuro premium
+        padding: 20,
+        marginVertical: 10,
+        borderRadius: 15,
+        width: '90%',
+        borderLeftColor: '#d30a0a', // Tu rojo corporativo
+        borderLeftWidth: 6,
+        // Sombras para dar profundidad de "proyecto real"
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 10,
+        alignSelf: 'center',
+        position: 'relative' // Necesario para el icono play
 },
 
 

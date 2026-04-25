@@ -73,7 +73,7 @@ const ActualizarGamificaciones = async (req, res) => {
         }
 
        //Aquí definimos otra bonificaciones,dónde se recompensa por sesiones registradas dentro de un rango establecido de 24 horas
-        if (totalCaloriasQuemadas >= 10) {
+        if (totalCaloriasQuemadas >= 300) {
             puntos_ranking += 20;
             mensajeResponse += ` | +20 pts por quemar ${totalCaloriasQuemadas} kcal.`;
         }
