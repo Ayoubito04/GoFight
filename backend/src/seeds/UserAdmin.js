@@ -31,8 +31,10 @@ const crearAdmin=async()=>{
                 nombre:'Admin',
                 email:adminEmail,
                 contrasena:hashPassword,
-                rol:'admin'
-                
+                rol:'admin',
+                gamificaciones:{
+                    create:{racha_dias:0,puntos_ranking:0}
+                }
             }
     })
     console.log('Usuario admin creado exitosamente',admin);

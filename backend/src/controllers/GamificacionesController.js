@@ -121,15 +121,15 @@ const ActualizarGamificaciones = async (req, res) => {
 };
 const VerGamificaciones=async(req,res)=>{
       const id_usuario=req.user?.id;
-      console.log('ID del usuario desde VerGamificaciones:', id_usuario); // Agrega este console.log para verificar el ID del usuario
       try{
-          const gamificaciones=await prisma.gamificaciones.findFirst({
+          let gamificaciones=await prisma.gamificaciones.findFirst({
                   where:{id_usuario:id_usuario}
 
           })
           if(!gamificaciones){
-             return res.status(404).json({message:'No se han encontrado gamificaciones para este usuario'
-                +gamificaciones
+             //Si el usuario todavía no tiene gamificaciones (p.ej. se creó fuera del registro normal),las creamos con valores por defecto en vez de fallar
+             gamificaciones=await prisma.gamificaciones.create({
+                data:{id_usuario,racha_dias:0,puntos_ranking:0}
              });
           }
             res.status(200).json({message:'Gamificaciones obtenidas exitosamente',gamificaciones});
