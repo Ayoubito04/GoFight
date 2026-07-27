@@ -10,6 +10,7 @@ import {useNavigation} from '@react-navigation/native';
 import {loginUser} from '../services/services';
 import ErrorMsg from '../components/ErrorMsg';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 
 const Login=()=>{
     const navigation=useNavigation();
@@ -44,7 +45,7 @@ const Login=()=>{
        if(loading){
         return(
             <View style={styles.Container}>
-                <ActivityIndicator size="large" color="#ff0000"/>
+                <ActivityIndicator size="large" color={COLORS.primary}/>
             </View>
 
         )
@@ -73,80 +74,59 @@ const Login=()=>{
        }
 }
 const styles=StyleSheet.create({
-        ScrollViewStyle:{
-            width:'80%',
-            backgroundColor:'#f0f0f0',
-            padding:20,
-            borderRadius:10,
-        },
         Container:{
             flex:1,
             justifyContent:'center',
             alignItems:'center',
-            backgroundColor:'#080808',
+            backgroundColor:COLORS.background,
             width:'100%',
-           
-           
+        },
+        TitleContainer:{
+            alignItems:'center',
         },
         LoginContainer:{
             width:'85%',
-            backgroundColor:'#0F0F0F',
+            backgroundColor:COLORS.surfaceAlt,
             padding:24,
-            borderRadius:14,
-            borderColor:'rgba(255,34,51,0.25)',
+            borderRadius:RADIUS.xl,
+            borderColor:'rgba(255, 34, 51,0.25)',
             borderWidth:1,
-            gap:10,
-            marginTop:20,
-            shadowColor:'rgba(255,34,51,0.25)',
-            shadowOffset:{width:0,height:4},
-            shadowOpacity:0.5,
-            shadowRadius:10,
-            elevation:5,
-            
+            gap:SPACING.sm,
+            marginTop:SPACING.xl,
+            ...shadow(COLORS.primaryGlow,0.5,10,5,{width:0,height:4}),
         },
         LogoStyle:{
-            fontSize:24,
-            fontWeight:'bold',
-            color:'#FF2233',
+            fontSize:26,
+            fontWeight:'800',
+            color:COLORS.primary,
             letterSpacing:2,
-            marginBottom:20,
+            marginBottom:SPACING.xl,
             textTransform:'uppercase',
-            textShadowColor:'rgba(255,34,51,0.5)',
+            textShadowColor:'rgba(255, 34, 51,0.5)',
             textShadowOffset:{width:2,height:2},
             textShadowRadius:10,
-
-
         },
         TitleStyle:{
             fontSize:18,
             fontWeight:'800',
-            color:'#FF2233',
+            color:COLORS.primary,
             letterSpacing:2,
-            marginBottom:20,
+            marginBottom:SPACING.lg,
             textTransform:'uppercase',
-            textShadowColor:'rgba(255,34,51,0.5)',
+            textShadowColor:'rgba(255, 34, 51,0.5)',
             textShadowOffset:{width:2,height:2},
             textShadowRadius:10,
             textAlign:'center',
         },
-            FormStyle:{
-            width:'80%',
-            backgroundColor:'#f0f0f0',
-            padding:20,
-            borderRadius:10,
-        },
         Mensajes:{
-            color:'#555555',
-            marginTop:12,
+            color:COLORS.textSecondary,
+            marginTop:SPACING.sm,
             textAlign:'center',
-            marginTop:4,
-            
         },
         MensajeStyle:{
-            color:'#0062ff',
+            color:COLORS.info,
             textDecorationLine:'underline',
-           
         }
-     
+
 })
 export default Login;

@@ -1,20 +1,10 @@
 //Aquí vamos a crear la card para cada uno de los ejercicios
 import React, { useEffect, useState,useRef} from 'react';
 import {View,Text,StyleSheet} from 'react-native';
-import YoutubePlayer from 'react-native-youtube-iframe';
 import Button from './Button';
-import { getEjerciciosDeRutina } from '../services/services';
-import { registrarSesionHistorial } from '../services/services';
-//Vamos con la lógica de registrar la sesión y con la lógica de tiempo_descanso
 import {Video} from 'expo-av';
+import { COLORS, RADIUS, SPACING, categoriaColor, shadow } from '../theme';
 
-const getYoutubeId=(url)=>{
-    //Esta función es para obtener el id del video de youtube para poder mostrar el video en el card sin problema
-    const match=url.match(/[?&]v=([^&]+)/);
-    return match ? match[1] : null;
-    //Vale en el caso de que el video exista nos lo devolverá,si no existe nos devolverá null
-}
-//Una vez que hayamos obtenido el id del video,lo podemos mostrar en el card sin problema,ya que el componente de youtube player necesita el id del video para mostrarlo correctamente
 const EjercicioCard=({item, onCompletado})=>{
         const [tiempo,setTiempo]=useState(item.duracion_ejercicio);//Definimos el estado de tiempo de cada uno de los ejercicios,que después lo pasaremos a un intervalo de tiempo
         const [ejecutando,setEjecutando]=useState(false);
@@ -29,18 +19,12 @@ const EjercicioCard=({item, onCompletado})=>{
                          if(prevTiempo<=1){
                                 clearInterval(ref.current);setEjecutando(false); return 0;
                                 //En el casode que el intervalko sea menor a 0,limpiamos el intervalo y pasará a ser "0",ya que el tiempo negativo no existe
-                                  
+
                                 }
                                 return prevTiempo-1;
                                 //Y vamos restando el tiempo cada segundo,para mostrar el tiempo restante de cada uno de los ejercicios
-
-
-
-                                
-
-                           
                          }
-                       
+
                       );
                  },1000);
             }
@@ -71,7 +55,7 @@ const EjercicioCard=({item, onCompletado})=>{
                         //En el caso de que el tiempo sea igual a 0 y la fase sea "descanso",pasaremos a la fase de ejercicio,definiremos el tiempo de ejercicio y empezaremos a ejecutar el intervalo de tiempo para mostrar el tiempo restante de cada uno de los ejercicios
                  }
 
-                 
+
                 }
          },[tiempo,Fase])
          const formatoTiempo=(tiempo)=>{
@@ -82,124 +66,92 @@ const EjercicioCard=({item, onCompletado})=>{
                 //Definimos el formato de tiempo que va a ser de minutos y segundos,para que se muestre correctamente el tiempo restante de cada uno de los ejercicios
          }
          //Una vez que hayamos definido el formato de tiempo,lo podemos mostrar en el card sin problema,ya que el formato de tiempo se va a ir actualizando cada segundo,para mostrar el tiempo restante de cada uno de los ejercicios
+         const color=categoriaColor(item.ejercicios.categoria);
          return(
                 <View style={styles.card}>
       <Video
          source={{ uri: item.ejercicios.url_video }}
-  style={{ width: '100%', height: 250, borderRadius: 10, marginBottom: 10 }}
-  useNativeControls
-  resizeMode="cover"
+         style={styles.video}
+         useNativeControls
+         resizeMode="cover"
       />
       <Text style={styles.nombre}>{item.ejercicios.nombre}</Text>
-      <Text style={[styles.info,{
-          //Ahora vamos a definir el color de los bordes de la categorría,dependiendo de que categoría sea
-             borderColor: item.ejercicios.categoria === 'Fuerza' ? '#f80404' : item.ejercicios.categoria === 'Cardio' ? '#04f84c' : item.ejercicios.categoria === 'Saco' ? '#049ef8' : '#ffffff',
-             borderWidth: 1,
-             padding: 5,
-             borderRadius: 5,
-             alignSelf: 'flex-start',
-             color: item.ejercicios.categoria === 'Fuerza' ? '#f80404' : item.ejercicios.categoria === 'Cardio' ? '#04f84c' : item.ejercicios.categoria === 'Saco' ? '#049ef8' : '#ffffff',
-             boxShadow:item.ejercicios.categoria === 'Fuerza' ? '0 0 3px #f80404' : item.ejercicios.categoria === 'Cardio' ? '0 0 3px #04f84c' : item.ejercicios.categoria === 'Saco' ? '0 0 3px #049ef8' : '0 0 3px #ffffff',
-             fontWeight: 'bold',
-             marginBottom: 10,
-      }]}>{item.ejercicios.categoria}</Text>
+      <Text style={[styles.info,{ borderColor:color, color }]}>{item.ejercicios.categoria}</Text>
          {Fase === 'ejercicio' && tiempo > 0 &&
          <Button title={ejecutando ? `Detener ${formatoTiempo(tiempo)}` : `Iniciar  ${formatoTiempo(item.duracion_ejercicio)}`} onPress={() => setEjecutando(!ejecutando)}
           />
          }
-     
-         {Fase === 'descanso' && tiempo > 0 ? ( 
+
+         {Fase === 'descanso' && tiempo > 0 ? (
                 <Text style={styles.CronometroDesanso}>Tiempo de descanso: {formatoTiempo(tiempo)}</Text>
-                
-      
+
+
          ) : null}
-         {Fase === 'Finalizado el tiempo de descanso' ? (               
+         {Fase === 'Finalizado el tiempo de descanso' ? (
                 <Text style={styles.message}>¡Tiempo de descanso finalizado! Prepárate para el siguiente ejercicio.</Text>
          ) : null}
-                
 
-        
+
+
     </View>
          )
 }
 
 const styles=StyleSheet.create({
-        EjercicioTitle:{
-                fontSize:20,
-                fontWeight:'bold',
-                marginBottom:10,
-        },
-        EjercicioDescription:{
-                fontSize:16,
-                marginBottom:10,
-        },
         card:{
-                backgroundColor:'#2d2828',
-                borderRadius:10,
-                padding:10,
-                marginBottom:20,
-                shadowColor:'rgba(0,0,0,0.5)',
-                shadowOffset:{width:0,height:2},
-                shadowOpacity:0.5,
-                shadowRadius:10,
-                elevation:5,
-                borderColor:'#393131',
+                backgroundColor:COLORS.surface,
+                borderRadius:RADIUS.lg,
+                padding:SPACING.md,
+                marginBottom:SPACING.lg,
+                borderColor:COLORS.border,
                 borderWidth:1,
-                letterSpacing:1,
-                boxShadow:'0 0 10px rgba(115, 112, 112, 0.5)',
-                shadowColor:'rgba(123, 121, 121, 0.5)',
-                shadowOffset:{width:0,height:2},
-                shadowOpacity:0.5,
-                shadowRadius:10,
-                elevation:5,
+                ...shadow('rgba(0,0,0,0.5)',0.5,10,5,{width:0,height:2}),
         },
          video:{
                 width:'100%',
-                height:200,
-                borderRadius:10,
-                marginBottom:10,
-
+                height:220,
+                borderRadius:RADIUS.md,
+                marginBottom:SPACING.md,
+                backgroundColor:COLORS.black,
         },
         nombre:{
                 fontSize:18,
-                fontWeight:'bold',
-                marginBottom:5,
-                letterSpacing:1,
-                 color:'#ffffff',
+                fontWeight:'700',
+                marginBottom:SPACING.sm,
+                letterSpacing:0.5,
+                 color:COLORS.textPrimary,
         },
         info:{
-                fontSize:14,
-                marginBottom:5,
+                fontSize:12,
+                fontWeight:'700',
+                marginBottom:SPACING.md,
                 letterSpacing:1,
-                color:'#ffffff',
+                borderWidth:1,
+                paddingHorizontal:SPACING.sm,
+                paddingVertical:4,
+                borderRadius:RADIUS.sm,
+                alignSelf:'flex-start',
+                textTransform:'uppercase',
         },
         message:{
-               fontSize: 16,
-  fontWeight: 'bold',
-  color: '#04f84c',
-  borderColor: '#04f84c',
-  borderWidth: 1,
-  padding: 10,
-  borderRadius: 8,
-  textAlign: 'center',
-  marginTop: 10,
-  letterSpacing: 1,
+               fontSize: 14,
+               fontWeight: '700',
+               color: COLORS.success,
+               borderColor: COLORS.success,
+               borderWidth: 1,
+               padding: SPACING.md,
+               borderRadius: RADIUS.md,
+               textAlign: 'center',
+               marginTop: SPACING.md,
+               letterSpacing: 0.5,
         },
         CronometroDesanso:{
-              fontSize: 16,
-  fontWeight: 'bold',
-  color: '#44aaff',
-  textAlign: 'center',
-  letterSpacing: 4,
-  marginVertical: 10,
+              fontSize: 15,
+              fontWeight: '700',
+              color: COLORS.info,
+              textAlign: 'center',
+              letterSpacing: 3,
+              marginVertical: SPACING.md,
         },
-        timer:{
-                fontSize:16,
-                fontWeight:'bold',
-                marginBottom:10,
-                letterSpacing:2,
-                color:'#ffffff',
-
-        }
 })
 export default EjercicioCard;

@@ -16,6 +16,7 @@ import { Image } from 'react-native';
 import Button from '../components/Button';
 import { Modal } from 'react-native';
 import TextInput from '../components/TextInput';
+import { COLORS } from '../theme';
 const Perfil = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [perfil, setPerfil] = useState(null);
@@ -79,7 +80,7 @@ const Perfil = ({ navigation }) => {
     if (loading) {
         return (
             <View style={styles.LoadingContainer}>
-                <ActivityIndicator size="large" color="#FF2233" />
+                <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
         );
     }
@@ -121,7 +122,7 @@ const Perfil = ({ navigation }) => {
                         iconName="lock-closed-outline"
                     />
                     <Button title="Guardar" onPress={handleChangeProfile} />
-                    <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+                    <Button title="Cancelar" variant="secondary" onPress={() => setModalVisible(false)} />
                 </View>
             </View>
         </Modal>
@@ -136,7 +137,7 @@ const Perfil = ({ navigation }) => {
       style={styles.AvatarImage}
     />
   ) : (
-    <Ionicons name="person-circle" size={90} color="#FF2233" />
+    <Ionicons name="person-circle" size={90} color={COLORS.primary} />
   )}
 </View>
                     <Text style={styles.NombreText}>{nombre}</Text>
@@ -148,7 +149,7 @@ const Perfil = ({ navigation }) => {
                     <Text style={styles.SectionTitle}>Información personal</Text>
 
                     <View style={styles.InfoRow}>
-                        <MaterialCommunityIcons name="email-outline" size={20} color="#FF2233" />
+                        <MaterialCommunityIcons name="email-outline" size={20} color={COLORS.primary} />
                         <Text style={styles.InfoLabel}>Email</Text>
                         <Text style={styles.InfoValue}>{email}</Text>
                     </View>
@@ -156,7 +157,7 @@ const Perfil = ({ navigation }) => {
                     <View style={styles.Divider} />
 
                     <View style={styles.InfoRow}>
-                        <Ionicons name="key-outline" size={20} color="#FF2233" />
+                        <Ionicons name="key-outline" size={20} color={COLORS.primary} />
                         <Text style={styles.InfoLabel}>Contraseña</Text>
                         <Text style={styles.InfoValue}>********</Text>
                        
@@ -189,7 +190,7 @@ const Perfil = ({ navigation }) => {
 
                 {/* Botón cerrar sesión */}
                 <TouchableOpacity style={styles.LogoutButton} onPress={handleLogout} activeOpacity={0.8}>
-                    <MaterialCommunityIcons name="logout" size={20} color="white" />
+                    <MaterialCommunityIcons name="logout" size={20} color={COLORS.danger} />
                     <Text style={styles.LogoutText}>Cerrar sesión</Text>
                 </TouchableOpacity>
 
@@ -212,20 +213,18 @@ const styles = StyleSheet.create({
         backgroundColor:'rgba(0,0,0,0.5)',
         position:'absolute',
         zIndex:10,
-        
-       
 
     },
     ModalContent:{
         width:'80%',
-        backgroundColor:'#0F0F0F',
+        backgroundColor:COLORS.surfaceAlt,
         padding:20,
         borderRadius:10,
         borderWidth:1,
-        borderColor:'rgba(255,34,51,0.2)',
-        shadowColor:'#FF2233',
+        borderColor:'rgba(255, 34, 51,0.2)',
+        shadowColor:COLORS.primary,
         shadowOffset:{width:0,height:4},
-        shadowOpacity:0.3,
+        shadowOpacity:0.2,
         shadowRadius:15,
         elevation:8,
         gap:15,
@@ -234,24 +233,21 @@ const styles = StyleSheet.create({
         fontSize:18,
         fontWeight:'700',
         color:'#ffffff',
-        textShadowColor:'rgba(255,34,51,0.5)',
-        textShadowOffset:{width:0,height:2},
-        textShadowRadius:10,
         fontFamily:'Helvetica',
         letterSpacing:1,
         textTransform:'uppercase',
         marginBottom:15,
     },
-    
+
     LoadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#080808',
+        backgroundColor: COLORS.background,
     },
     Container: {
         flex: 1,
-        backgroundColor: '#080808',
+        backgroundColor: COLORS.background,
         justifyContent: 'space-between',
     },
     ScrollContent: {
@@ -264,12 +260,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 30,
         borderRadius: 20,
-        backgroundColor: '#0F0F0F',
+        backgroundColor: COLORS.surfaceAlt,
         borderWidth: 1,
         borderColor: 'rgba(255, 34, 51, 0.2)',
-        shadowColor: '#FF2233',
+        shadowColor: COLORS.primary,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.2,
         shadowRadius: 15,
         elevation: 8,
     },
@@ -280,9 +276,6 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '700',
         color: '#ffffff',
-        textShadowColor: 'rgba(255, 34, 51, 0.5)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 10,
         fontFamily: 'Helvetica',
         letterSpacing: 1,
         textTransform: 'uppercase',
@@ -290,7 +283,7 @@ const styles = StyleSheet.create({
     TipoText: {
         marginTop: 6,
         fontSize: 10,
-        color: '#FF2233',
+        color: COLORS.primary,
         letterSpacing: 2.5,
         fontFamily: 'Helvetica',
         textTransform: 'uppercase',
@@ -298,11 +291,11 @@ const styles = StyleSheet.create({
 
     // Secciones
     Section: {
-        backgroundColor: '#0F0F0F',
+        backgroundColor: COLORS.surfaceAlt,
         borderRadius: 20,
         padding: 18,
         borderWidth: 1,
-        borderColor: 'rgba(70, 34, 34, 0.4)',
+        borderColor: COLORS.border,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.4,
@@ -355,11 +348,11 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#1a1a1a',
+        backgroundColor: COLORS.surfaceElevated,
         borderRadius: 15,
         paddingVertical: 20,
         borderWidth: 1,
-        borderColor: '#484141',
+        borderColor: COLORS.border,
         gap: 6,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -371,9 +364,6 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 22,
         fontWeight: '700',
-        textShadowColor: 'rgba(255, 34, 51, 0.4)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 8,
         letterSpacing: 1,
     },
     StatLabel: {
@@ -390,19 +380,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FF2233',
+        backgroundColor: 'rgba(255,71,87,0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,71,87,0.35)',
         borderRadius: 14,
         paddingVertical: 16,
         gap: 10,
-        shadowColor: '#FF2233',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 12,
-        elevation: 8,
         marginBottom: 10,
     },
     LogoutText: {
-        color: 'white',
+        color: COLORS.danger,
         fontSize: 14,
         fontWeight: '700',
         textTransform: 'uppercase',
@@ -414,7 +401,7 @@ const styles = StyleSheet.create({
   height: 90,
   borderRadius: 45,
   borderWidth: 2,
-  borderColor: '#FF2233',
+  borderColor: COLORS.primary,
 },
 });
 

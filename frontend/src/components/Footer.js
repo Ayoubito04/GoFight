@@ -1,138 +1,75 @@
 //Aquí vamos a definir el componente footer,que es el pie de la aplicación,dónde se va a colocar cada uno de las secciones de la aplicación
 import React from 'react';
-import {View,Text,StyleSheet,FlatList, Touchable, TouchableOpacity} from 'react-native';
-import {MaterialCommunityIcons} from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import {View,StyleSheet,TouchableOpacity} from 'react-native';
+import {Ionicons} from '@expo/vector-icons';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { COLORS, SPACING, shadow } from '../theme';
 
 
 const Footer=()=>{
       const navigation=useNavigation();
+      const currentRoute=useNavigationState(state=>state?.routes?.[state.index]?.name);
       const sections=[
-            {id:'1',title:'Inicio',icono:'home',screen:'home'},
-            {id:'2',title:'Rutinas',icono:'dumbbell',screen:'Rutinas'},
-            {id:'3',title:'Progreso',icono:'chart-line',screen:'Progreso'},
-            {id:'4',title:'Perfil',icono:'account',screen:'Perfil'},
+            {id:'1',icono:'home',screen:'home'},
+            {id:'2',icono:'barbell',screen:'Rutinas'},
+            {id:'3',icono:'stats-chart',screen:'Progreso'},
+            {id:'4',icono:'person',screen:'Perfil'},
 
       ];
-      //Hemosdefinido las secciones,es hora de implementarlas en una FlatList,que es para renderizar listas
       return(
-        <View style={styles.Container}>
-          <FlatList
-           data={sections}
-           flexDirection='row'
-           horizontal={true}
-           showsHorizontalScrollIndicator={false}
-           alignItems='center'
-           justifyContent='center'
-           contentContainerStyle={styles.ListStyle}
-           
-           
-           
-          
-             
-            
-
-            
-           keyExtractor={(item)=>item.id}
-           renderItem={({item})=>{
-             return (
-             <View style={styles.Item}>
-                 <TouchableOpacity style={styles.TouchableOpacity}
-                 onPress={() => navigation.navigate(item.screen)}>
-                  <MaterialCommunityIcons name={item.icono} size={24} style={styles.IconStyle}/>  
-
-                 </TouchableOpacity>
-                  <Text style={styles.TextStyle}>{item.title}</Text>
-                  
-             </View>
-             )
-           }}
-            />
-            </View>
-            //Ya hemos definido la FlatList del footer,que va renderizar cada una de las secciones en uno en uno
+        <View style={styles.Wrapper}>
+          <View style={styles.Pill}>
+                {sections.map((item)=>{
+                      const active=currentRoute===item.screen;
+                      return (
+                            <TouchableOpacity
+                                  key={item.id}
+                                  style={styles.Item}
+                                  activeOpacity={0.7}
+                                  onPress={() => !active && navigation.navigate(item.screen)}>
+                                  <Ionicons name={active ? item.icono : `${item.icono}-outline`} size={22} color={active ? COLORS.primary : COLORS.textMuted}/>
+                                  <View style={[styles.Dot, active && styles.DotActive]}/>
+                            </TouchableOpacity>
+                      )
+                })}
+          </View>
+        </View>
       )
-     
+
 }
 const styles=StyleSheet.create({
-
-  ListStyle:{
-      flex:1,
-      flexDirection:'row',
-      justifyContent:'space-between',
-      alignItems:'center',
-      padding:10,
-      gap:10,
-      
-  
-
-
-  },
-        Container:{
-            flexDirection:'row',
-            justifyContent:'center',
-            alignItems:'center',
-            padding:10,
-            gap:10,
-              borderRadius:5,
-              
-              backgroundColor:'#080808',
-             
-              
-              borderTopColor:'rgb(0, 0, 0)'
-         
-        
-           
-           
-           
-
-           
-
-
+        Wrapper:{
+              backgroundColor:COLORS.background,
+              paddingHorizontal:SPACING.xl,
+              paddingBottom:SPACING.md,
+              paddingTop:SPACING.xs,
+        },
+        Pill:{
+              flexDirection:'row',
+              justifyContent:'space-around',
+              alignItems:'center',
+              backgroundColor:COLORS.surfaceElevated,
+              borderRadius:32,
+              paddingVertical:SPACING.sm,
+              borderWidth:1,
+              borderColor:COLORS.border,
+              ...shadow('#000',0.4,14,8,{width:0,height:6}),
         },
         Item:{
-             borderTopColor:'black',
-            borderWidth:1,
-            borderRadius:5,
-           
-              width:80,
-              height:80,
-              justifyContent:'center',
-
+              width:52,
+              height:44,
               alignItems:'center',
-              backgroundColor:'black',
+              justifyContent:'center',
               gap:5,
-              
-              
-
-
         },
-        TouchableOpacity:{
-              padding:5,
-              borderRadius:5,
-              
+        Dot:{
+              width:4,
+              height:4,
+              borderRadius:2,
+              backgroundColor:'transparent',
         },
-        TextStyle:{
-              fontSize:12,
-              color:'white',
-              fontWeight:'bold',
-              textShadowColor:'rgba(255, 255, 255, 0.5)',
-              textShadowOffset:{width:1,height:1},
-              textShadowRadius:3,
-              textTransform:'uppercase',
-              letterSpacing:1.1,
-              textAlign:'center'
-
-
-
+        DotActive:{
+              backgroundColor:COLORS.primary,
         },
-        IconStyle:{
-         color:'white',
-          textShadowColor:'rgba(255, 255, 255, 0.5)',
-          textShadowOffset:{width:1,height:1},
-          textShadowRadius:3,
-
-          padding:2,
-          borderRadius:3,
-        }
 })
 export default Footer;

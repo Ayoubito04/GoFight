@@ -1,13 +1,16 @@
 //Vamos a definir el header de la aplicación,que va a ser un componente esencial para casí todas las paginas
 import React from 'react';
-import {View,Text,StyleSheet,SafeAreaView, Platform, StatusBar} from 'react-native';
-import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import {View,Text,StyleSheet,SafeAreaView, Platform, StatusBar, TouchableOpacity, Alert} from 'react-native';
+import {Ionicons} from '@expo/vector-icons';
 import { getUserProfile } from '../services/services';
 import { useEffect, useState } from 'react';
+import { COLORS, SPACING } from '../theme';
+import SideMenu from './SideMenu';
 
-     
+
 const Header=()=>{
      const [userProfile,setUserProfile]=useState(null);
+     const [menuVisible,setMenuVisible]=useState(false);
       useEffect(()=>{
         //Aquí vamos a definir la lógica para obtener el perfil del usuario
         const fetchUserProfile=async()=>{
@@ -23,136 +26,78 @@ const Header=()=>{
         }
         fetchUserProfile();
       },[]);
+
+      const nombre=userProfile?.perfilUsuario?.nombre;
+      const isAdmin=userProfile?.perfilUsuario?.rol==='admin';
+
       return(
-            <SafeAreaView>
+            <SafeAreaView style={style.HeaderArea}>
                   <View style={style.HeaderContainer}>
-            
-            <View style={style.FirstRow}>
-            <MaterialCommunityIcons name='menu' size={24} color='white'/>
-              </View>
-              <View style={style.SecondRow}>
-             <Text style={style.TitleStyle}>GoFight</Text>
-              <Text style={style.TextStyle}>Bienvenido: {userProfile ? userProfile.perfilUsuario.nombre: 'Invitado'}</Text>
-           <View style={style.UserProfileContainer}>
-                  <Ionicons name='person-circle' size={24} style={style.IconStyle}/>
-             </View>
-             <View>
-                  <Text style={style.SubtitleStyle}>Tu entrenador personal</Text>
+                        <TouchableOpacity style={style.IconButton} onPress={()=>setMenuVisible(true)} hitSlop={10}>
+                              <Ionicons name='menu' size={24} color={COLORS.textPrimary}/>
+                        </TouchableOpacity>
+
+                        <View style={style.GreetingContainer}>
+                              <Text style={style.Greeting} numberOfLines={1}>Hola, {nombre || 'Invitado'} 👋</Text>
+                              <Text style={style.Subtitle}>Listo para superar tus objetivos hoy</Text>
+                        </View>
+
+                        <TouchableOpacity style={style.IconButton} onPress={()=>Alert.alert('Notificaciones','No tienes notificaciones nuevas')} hitSlop={10}>
+                              <Ionicons name='notifications-outline' size={22} color={COLORS.textPrimary}/>
+                              <View style={style.NotificationDot}/>
+                        </TouchableOpacity>
                   </View>
-            </View>
-            </View>
+                  <SideMenu visible={menuVisible} onClose={()=>setMenuVisible(false)} userName={nombre} isAdmin={isAdmin}/>
          </SafeAreaView>
       )
 }
 const style=StyleSheet.create({
      HeaderArea:{
-      //Vamos a definir los estilos del SafeAreaView,queremos que el SafeAreaView sea compatible tanto en Andorid como IOS
-      
-      backgroundColor:'#FF2233',
+      backgroundColor:COLORS.background,
       paddingTop:Platform.OS==='android' ? StatusBar.currentHeight : 0,//Ajustamos el SafeAreaView para android
-   
-
-        
      },
       HeaderContainer:{
                   flexDirection:'row',
                   justifyContent:'space-between',
                   alignItems:'center',
-                  padding:10,
-                  borderBottomColor:'rgba(255,255,255,0.06)',
-                  borderBottomWidth:1,
-                  borderBottomStyle:'solid',
-                  backgroundColor:'#FF2233',
-                  borderRadius:10,
-                  shadowColor:'rgba(255,0,0,0.5)',
-                  shadowOffset:{width:0,height:2},
-                  shadowOpacity:0.5,
-                  shadowRadius:12,
-                  paddingHorizontal:20,
-                  paddingVertical:15,
-                  marginBottom:10,
-                  flexWrap:'wrap',
-                  gap:10,
-                
-
-
-
-                
-                  
+                  backgroundColor:COLORS.background,
+                  paddingHorizontal:SPACING.lg,
+                  paddingVertical:SPACING.md,
       },
-      FirstRow:{
-            flexDirection:'row',
+      IconButton:{
+            width:42,
+            height:42,
+            borderRadius:21,
+            backgroundColor:COLORS.surfaceElevated,
             alignItems:'center',
             justifyContent:'center',
-            gap:10,
-            flexWrap:'wrap',
-
-
       },
-      SecondRow:{
-            flexDirection:'row',
-            alignItems:'center',
-            justifyContent:'center',
-            gap:10,
+      NotificationDot:{
+            position:'absolute',
+            top:10,
+            right:11,
+            width:7,
+            height:7,
+            borderRadius:4,
+            backgroundColor:COLORS.primary,
+            borderWidth:1,
+            borderColor:COLORS.surfaceElevated,
+      },
+      GreetingContainer:{
             flex:1,
-            flexWrap:'wrap',
-            justifyContent:'space-between',
-            paddingHorizontal:10,
-
+            paddingHorizontal:SPACING.md,
       },
-      TitleStyle:{
-            fontSize:20,
-            fontWeight:'700',
-            color:'#ffffff',
-            textShadowColor:'rgba(255, 255, 255, 0.5)',
-            textShadowOffset:{width:0,height:2},
-            textShadowRadius:12,
-            fontFamily:'Helvetica',
-            textTransform:'uppercase',
-            letterSpacing:1.1,
-            
-
+      Greeting:{
+            fontSize:16,
+            fontWeight:'800',
+            color:COLORS.textPrimary,
+            letterSpacing:0.3,
       },
-      TextStyle:{
-            fontSize:10,
-            fontWeight:'bold',
-            color:'#ffffff',
-            textShadowColor:'black',
-            textShadowOffset:{width:1,height:1},
-            textShadowColor:'rgba(255, 255, 255, 0.5)',
-            shadowOffset:{width:0,height:2},
-            shadowOpacity:0.5,
-            shadowRadius:12,
-            textShadowRadius:9,
-            fontFamily:'Helvetica',
-            textTransform:'uppercase',
-            letterSpacing:2,
-            paddingLeft:5,
-
+      Subtitle:{
+            fontSize:11,
+            color:COLORS.textSecondary,
+            marginTop:2,
       },
-      SubtitleStyle:{
-            fontSize:6,
-            color:'white',
-            textShadowColor:'black',
-            textShadowOffset:{width:1,height:1},
-            textShadowRadius:5,
-                  fontFamily:'Helvetica',
-                  textTransform:'uppercase',
-                  letterSpacing:1.5,
-                  marginTop:5,
-                  textAlign:'center'
-                   
-                  
-      },
-      IconStyle:{
-            color:'white',
-      },
-      UserProfileContainer:{
-            flexDirection:'row',
-            alignItems:'center',
-            justifyContent:'center',
-            gap:5,
-       
-      }
 })
+
 export default Header;

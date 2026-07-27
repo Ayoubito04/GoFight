@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { makeAdmin,deleteUserById,ActualizarUsuarioAdmin } from '../services/services';
 import {Modal} from 'react-native';
+import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 
 //Obtenemos el perfil del usuario primeramente para saber si es admin o no,ya que solo los admin pueden acceder a esta pantalla
 
@@ -104,7 +105,7 @@ const GestorUsuariosAdmin=()=>{
                 </View>
 
             </Modal>
-            <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+            <View style={styles.ListArea}>
                 {loading ? (
                     <Text style={styles.TextStyle}>Cargando usuarios...</Text>
                 ) : isAdmin ? (
@@ -112,40 +113,35 @@ const GestorUsuariosAdmin=()=>{
                         data={usuarios}
                         keyExtractor={(item) => item.id_usuario.toString()}
                         contentContainerStyle={styles.FlatList}
-                        renderItem={({ item }) => ( 
+                        renderItem={({ item }) => (
                             <View style={styles.Card}>
-                               <View style={styles.RegistrosStyle}>
-                                {item.rol==='admin' && <Ionicons name="shield-checkmark" size={15} color="#ff4444" />}
-                                {item.rol!=='admin' && <Ionicons name="person" size={15} color="#ff4444" />}
-                                <Text style={styles.TextStyle}>nombre:{item.nombre}</Text>
-                                   
-                                
-                                <Text style={styles.TextStyle}>email:{item.email}</Text>
-                                 
-                                <Text style={styles.TextStyle}>rol:{item.rol}</Text>
-                                
-                                  </View>
-                               <View style={styles.RegistrosStyle}>
-                                 <TouchableOpacity style={{padding:10,borderRadius:5}} onPress={() => handleDeleteUser(item.id_usuario)}>
-                                  <Ionicons name="trash" size={15} color="#ff4444" />
-                                </TouchableOpacity>
-                                 <TouchableOpacity style={{padding:10,borderRadius:5}} onPress={() => handleMakeAdmin(item.id_usuario, item.nombre, item.email, item.rol)}>
-                                  <Ionicons name="shield-checkmark" size={15} color="#ff4444" />
-                                </TouchableOpacity>
-                                 <TouchableOpacity style={{padding:10,borderRadius:5}} onPress={() => handleActualizarUsuarioAdmin(item.id_usuario, item.nombre, item.email, item.rol)}>
-                                  <Ionicons name="create" size={15} color="#ff4444"/>
-                                </TouchableOpacity>
-                             
+                               <View style={styles.InfoColumn}>
+                                <View style={styles.RolRow}>
+                                    <Ionicons name={item.rol==='admin' ? 'shield-checkmark' : 'person'} size={15} color={COLORS.primary} />
+                                    <Text style={styles.RolText}>{item.rol}</Text>
                                 </View>
-                                
+                                <Text style={styles.NombreText}>{item.nombre}</Text>
+                                <Text style={styles.EmailText}>{item.email}</Text>
+                                  </View>
+                               <View style={styles.ActionsRow}>
+                                 <TouchableOpacity style={styles.ActionButton} onPress={() => handleDeleteUser(item.id_usuario)}>
+                                  <Ionicons name="trash" size={16} color={COLORS.danger} />
+                                </TouchableOpacity>
+                                 <TouchableOpacity style={styles.ActionButton} onPress={() => handleMakeAdmin(item.id_usuario, item.nombre, item.email, item.rol)}>
+                                  <Ionicons name="shield-checkmark" size={16} color={COLORS.info} />
+                                </TouchableOpacity>
+                                 <TouchableOpacity style={styles.ActionButton} onPress={() => handleActualizarUsuarioAdmin(item.id_usuario, item.nombre, item.email, item.rol)}>
+                                  <Ionicons name="create" size={16} color={COLORS.success}/>
+                                </TouchableOpacity>
 
-                                {/* Aquí podríamos agregar botones para eliminar o modificar el usuario */}
+                                </View>
+
                             </View>
-                            
+
                         )}
                     />
                 ) : (
-                    <Text>No tienes permisos para acceder a esta pantalla</Text>
+                    <Text style={styles.TextStyle}>No tienes permisos para acceder a esta pantalla</Text>
                 )}
             </View>
             <Footer />
@@ -156,105 +152,107 @@ const GestorUsuariosAdmin=()=>{
 const styles=StyleSheet.create({
     Container:{
         flex:1,
-        backgroundColor:'black',
-        
-     
+        backgroundColor:COLORS.background,
+    },
+    ListArea:{
+        flex:1,
     },
     Modal:{
         flex:1,
         justifyContent:'center',
         alignItems:'center',
-        backgroundColor:'rgba(0,0,0,0.5)',
+        backgroundColor:'rgba(0,0,0,0.7)',
         width:'100%',
         height:'100%',
-      
-      
-
     },
     ModalContainer:{
         width:'90%',
-        backgroundColor:'#111',
-        padding:20,
-        borderRadius:10,
-        borderBlockColor:'#ff4444',
+        backgroundColor:COLORS.surfaceAlt,
+        padding:SPACING.xl,
+        borderRadius:RADIUS.lg,
+        borderColor:'rgba(255, 34, 51,0.2)',
         borderWidth:1,
-        shadowColor:'#ff4444',
-        shadowOffset:{width:0,height:4},
-        shadowOpacity:0.15,
-        shadowRadius:8,
-        elevation:5,
+        ...shadow(COLORS.primary,0.15,8,5,{width:0,height:4}),
         justifyContent:'center',
         alignItems:'center',
         paddingVertical:30,
-        gap:20,
+        gap:SPACING.xl,
     },
-    
+
    ModalTextStyle:{
     fontSize:18,
-    fontWeight:'bold',
-    color:'#ff4444',
-    marginBottom:20,
+    fontWeight:'700',
+    color:COLORS.primary,
+    marginBottom:SPACING.md,
     textAlign:'center',
+    textTransform:'uppercase',
+    letterSpacing:1,
 
    },
     FlatList:{
-        
-    padding: 20,
-  backgroundColor: '#000',
-  flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    
-    
-
-
+    padding: SPACING.lg,
+    flexGrow: 1,
     },
-    
+
     Card:{
-  backgroundColor: '#111',
-  padding: 16,
-  borderRadius: 12,
-  marginBottom: 12,
-  borderLeftWidth: 4,
-  borderLeftColor: '#ff0000',
-  borderWidth: 0, 
-  shadowColor: '#ff0000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.15,
-  shadowRadius: 8,
-  elevation: 5,
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  width: '100%',
-
-        
-    
-        
+      backgroundColor: COLORS.surface,
+      padding: SPACING.lg,
+      borderRadius: RADIUS.md,
+      marginBottom: SPACING.md,
+      borderLeftWidth: 4,
+      borderLeftColor: COLORS.primary,
+      ...shadow('#000',0.3,8,5,{width:0,height:4}),
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
     },
-  RegistrosStyle:{
-    fontSize: 14,
-  fontWeight: '600',
-  color: '#ffffff',
-    letterSpacing: 1,
-    gap: 4,
-
-     
-  },
+    InfoColumn:{
+        flex:1,
+        gap:4,
+    },
+    RolRow:{
+        flexDirection:'row',
+        alignItems:'center',
+        gap:6,
+        marginBottom:2,
+    },
+    RolText:{
+        fontSize:11,
+        fontWeight:'700',
+        color:COLORS.primary,
+        textTransform:'uppercase',
+        letterSpacing:1,
+    },
+    NombreText:{
+        fontSize:15,
+        fontWeight:'700',
+        color:COLORS.textPrimary,
+    },
+    EmailText:{
+        fontSize:12,
+        color:COLORS.textSecondary,
+    },
+    ActionsRow:{
+        flexDirection:'row',
+        gap:SPACING.xs,
+    },
+    ActionButton:{
+        padding:SPACING.sm,
+        borderRadius:RADIUS.sm,
+        backgroundColor:COLORS.surfaceElevated,
+    },
     TextStyle:{
-        fontSize: 13,
-  fontWeight: 'bold',
-  letterSpacing: 1,
-  color: '#ffffff',
-  fontFamily: Platform.OS === 'ios' ? 'Avenir' : 'Roboto',
-  textShadowColor: 'rgba(255, 0, 0, 0.5)',
-  textShadowOffset: { width: 2, height: 2 },
-  textShadowRadius: 4, // ← añade esto
-
+        fontSize: 14,
+        fontWeight: '600',
+        letterSpacing: 1,
+        color: COLORS.textSecondary,
+        fontFamily: Platform.OS === 'ios' ? 'Avenir' : 'Roboto',
+        textAlign:'center',
+        marginTop:SPACING.xl,
     }
-   
+
 
         })
-    
+
 export default GestorUsuariosAdmin;

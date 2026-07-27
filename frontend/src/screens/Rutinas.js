@@ -8,6 +8,7 @@ import { getRutinasDisponibles } from '../services/services';
 import Button from '../components/Button';
 import TextInputComponent from '../components/TextInput';
 import { useNavigation } from '@react-navigation/native';
+import { COLORS, RADIUS, SPACING, difficultyColor, shadow } from '../theme';
 
 
 const Rutinas=()=>{
@@ -60,12 +61,9 @@ const Rutinas=()=>{
                 navigation.navigate('Ejercicios',{rutinaId});
         }
         if(loading){
-                return( 
-                        
+                return(
                         <View style={styles.ActivityIndicatorStyle}>
-                               
-                                <ActivityIndicator size="large" color="#ff0000"/>
-                       
+                                <ActivityIndicator size="large" color={COLORS.primary}/>
                         </View>
                 )
 
@@ -74,76 +72,28 @@ const Rutinas=()=>{
                 return(
                         <SafeAreaView style={styles.Container}>
                                 <Header/>
-                                <TextInputComponent placeholder="Buscar rutina para..." value={searchRutina} onChangeText={handleSearch} iconName="search"
-                                />
-                                
+                                <View style={styles.SearchContainer}>
+                                        <TextInputComponent placeholder="Buscar rutina..." value={searchRutina} onChangeText={handleSearch} iconName="search"
+                                        />
+                                </View>
+
                                  <FlatList
                                        data={rutinasfiltradas}
                                        contentContainerStyle={styles.flatListContent}
                                        horizontal={false}
                                        showsVerticalScrollIndicator={false}
-                                       
-                                       justifyContent='center'
-                                       
-                                       
                                        keyExtractor={item => item.id_rutina.toString()}
-                                            renderItem={({item})=>(
-                                                <TouchableOpacity style={styles.itemContainer
-                                                        
-                                                }onPress={()=>handleEjercicio(item.id_rutina)}>
+                                            renderItem={({item})=>{
+                                                const color=difficultyColor(item.dificultad);
+                                                return(
+                                                <TouchableOpacity style={styles.itemContainer} activeOpacity={0.75} onPress={()=>handleEjercicio(item.id_rutina)}>
                                                         <Text style={styles.TextStyle}>{item.nombre_rutina}</Text>
-                                                        <Text style={[
-                                                                        item.dificultad === 'Fácil' ? {color:'#00ff00',
-                                                                                borderColor:'#384f38',
-                                                                                borderWidth:2,
-                                                                                borderRadius:10,
-                                                                                paddingHorizontal:5,
-                                                                                paddingVertical:2,
-                                                                                width:'20%',
-                                                                                shadowColor:'#112b11',
-                                                                                shadowOffset:{width:0,height:2},
-                                                                                shadowOpacity:0.5,
-                                                                                shadowRadius:4,
-                                                                                elevation:5,
-                                                                                textAlign:'center',
-                                                                                alignSelf:'flex-start'
-                                                                        } :
-                                                                item.dificultad === 'Intermedio' ? {color:'#ffff00',
-                                                                         borderColor:'#363609',
-                                                                                borderWidth:2,
-                                                                                borderRadius:10,
-                                                                                paddingHorizontal:5,
-                                                                                paddingVertical:2,
-                                                                                width:'30%',
-                                                                                shadowColor:'#363609',
-                                                                                shadowOffset:{width:0,height:2},
-                                                                                shadowOpacity:0.5,
-                                                                                shadowRadius:4,
-                                                                                elevation:5,
-                                                                                textAlign:'center',
-                                                                                alignSelf:'flex-start'
-                                                                } :
-                                                                item.dificultad === 'Avanzado' ? {color:'#ff0000',
-                                                                         borderColor:'#511313',
-                                                                                borderWidth:2,
-                                                                                borderRadius:10,
-                                                                                paddingHorizontal:5,
-                                                                                paddingVertical:2,
-                                                                                width:'30%',
-                                                                                shadowColor:'#4d0d0d',
-                                                                                shadowOffset:{width:0,height:2},
-                                                                                shadowOpacity:0.5,
-                                                                                shadowRadius:4,
-                                                                                elevation:5,
-                                                                                textAlign:'center',
-                                                                                alignSelf:'flex-start'
-                                                                } :
-                                                                {color:'#ffffff'}
-                                                        ]}onChangeText={handleSearch}>{item.dificultad}</Text>
-                                               <Ionicons name="play" size={20} color="#ffffff" style={{position:'absolute',top:10,right:10}}/>
+                                                        <Text style={[styles.dificultadTag,{color,borderColor:color}]}>{item.dificultad}</Text>
+                                               <Ionicons name="play-circle" size={26} color={COLORS.primary} style={styles.playIcon}/>
                                                 </TouchableOpacity>
-                                            )}
-                                 
+                                                )
+                                            }}
+
                               />
 
                                 <Footer/>
@@ -154,62 +104,56 @@ const Rutinas=()=>{
 const styles=StyleSheet.create({
         Container:{
                flex: 1,
-        backgroundColor: '#050505', // Un negro más profundo para que resalten las cards
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
-                
-
+               backgroundColor: COLORS.background,
+               paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+        },
+        SearchContainer:{
+                paddingHorizontal: SPACING.lg,
+                paddingTop: SPACING.md,
         },
         flatListContent: {
-         paddingVertical: 2,
-
-        // Espacio extra para que el Footer no tape nada
-
-        justifyContent: 'center',
-
-        bottom: 0,
-
-        paddingTop: 100,
-
-
-
-       
-
-       
-
-        overflow:'scroll'
-    },
+                paddingHorizontal: SPACING.lg,
+                paddingTop: SPACING.sm,
+                paddingBottom: SPACING.xl,
+        },
        itemContainer: {
-  backgroundColor: '#121212', // Gris oscuro premium
-        padding: 20,
-        marginVertical: 10,
-        borderRadius: 15,
-        width: '90%',
-        borderLeftColor: '#d30a0a', // Tu rojo corporativo
-        borderLeftWidth: 6,
-        // Sombras para dar profundidad de "proyecto real"
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 10,
-        alignSelf: 'center',
-        position: 'relative' // Necesario para el icono play
-},
-
-
+                backgroundColor: COLORS.surface,
+                padding: SPACING.xl,
+                marginVertical: SPACING.sm,
+                borderRadius: RADIUS.lg,
+                width: '100%',
+                borderLeftColor: COLORS.primary,
+                borderLeftWidth: 5,
+                ...shadow('#000',0.3,5,10,{width:0,height:4}),
+                position: 'relative',
+        },
+        dificultadTag:{
+                marginTop: SPACING.sm,
+                borderWidth: 1,
+                borderRadius: RADIUS.sm,
+                paddingHorizontal: SPACING.sm,
+                paddingVertical: 3,
+                fontSize: 11,
+                fontWeight: '700',
+                letterSpacing: 1,
+                textTransform: 'uppercase',
+                alignSelf: 'flex-start',
+        },
+        playIcon:{
+                position:'absolute',
+                top:SPACING.lg,
+                right:SPACING.lg,
+        },
         ActivityIndicatorStyle:{
                 flex:1,
                 justifyContent:'center',
                 alignItems:'center',
-                backgroundColor:'#000000'
+                backgroundColor:COLORS.background,
         },
         TextStyle:{
-                fontSize:20,
-                fontWeight:'bold',
-                textAlign:'center',
-                marginTop:20,
-                color:'#ffffff',
-
+                fontSize:17,
+                fontWeight:'700',
+                color:COLORS.textPrimary,
         },
 
 })

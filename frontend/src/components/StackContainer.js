@@ -9,6 +9,7 @@ import Button from   "./Button.js";
 import {useState,useEffect} from "react";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
+import { COLORS, RADIUS, SPACING, shadow } from "../theme";
 
 
 //Tenemos todo lo necesario,para crear el contenedor
@@ -40,11 +41,11 @@ const StackContainer=()=>{
               },2000);
                 return()=>clearTimeout(SetTimeout);
          },[]);
-         
+
          if(laoding){
                return(
-                      <View>
-                           <Text>Cargando...</Text>
+                      <View style={style.LoadingContainer}>
+                           <Text style={style.LoadingText}>Cargando...</Text>
                       </View>
                )
          }
@@ -57,12 +58,8 @@ const StackContainer=()=>{
                                         <Text style={style.Text}>  {`${gamificaciones?.gamificaciones?.racha_dias} dias`}</Text>
                                 </View>
                                 <View>
-                                    <Ionicons name="flame" size={24} color="#ff4500" style={style.Icon}/>
-                                    
+                                    <Ionicons name="flame" size={26} color="#ff4500" style={style.Icon}/>
                                 </View>
-                               <View>
-                                  
-                               </View>
                             </View>
                             <View style={style.StackConatiner}>
                                 <View>
@@ -70,12 +67,9 @@ const StackContainer=()=>{
                                         <Text style={style.Text}>  {`${gamificaciones?.gamificaciones?.puntos_ranking} puntos`}</Text>
                                 </View>
                                 <View>
-                                        <FontAwesome name="star" size={24} color="#fee500" style={style.Icon}/>
+                                        <FontAwesome name="star" size={26} color="#fee500" style={style.Icon}/>
                                 </View>
-                                <View>
-                                       <Button title="ver ranking" onPress={() => navigation.navigate('Ranking')}></Button>
-                                </View>
-                                  
+                                <Button title="ver ranking" variant="secondary" onPress={() => navigation.navigate('Ranking')}/>
                             </View>
                               <View style={style.StackConatiner}>
                                 <View>
@@ -83,9 +77,8 @@ const StackContainer=()=>{
                                         <Text style={style.Text}>  {`${sesionesHistorial.length || 0} completas`}</Text>
                                 </View>
                                 <View>
-                                        <FontAwesome name="calendar" size={24} color="#0efd3a" style={style.Icon}/>
+                                        <FontAwesome name="calendar" size={26} color="#0efd3a" style={style.Icon}/>
                                 </View>
-                                  
                             </View>
                               <View style={style.StackConatiner}>
                                 <View>
@@ -93,12 +86,9 @@ const StackContainer=()=>{
                                         <Text style={style.Text}>  {`${rutinas?.length || 0}`}</Text>
                                 </View>
                                 <View>
-                                        <FontAwesome name="list" size={24} color="#ffffff" style={style.Icon}/>
+                                        <FontAwesome name="list" size={26} color="#ffffff" style={style.Icon}/>
                                 </View>
-                                    <View>
-                                            <Button title="ver rutinas" onPress={() => navigation.navigate('MisRutinas')}></Button>
-                                </View>
-                                  
+                                <Button title="ver rutinas" variant="secondary" onPress={() => navigation.navigate('MisRutinas')}/>
                             </View>
 
                      </View>
@@ -106,64 +96,61 @@ const StackContainer=()=>{
          }
 }
 const style=StyleSheet.create({
-    Container:{
+    LoadingContainer:{
          flex:1,
          justifyContent:'center',
          alignItems:'center',
-         backgroundColor:'#080808',
+         paddingVertical:SPACING.xxl,
+    },
+    LoadingText:{
+         color:COLORS.textSecondary,
+         fontSize:13,
+         letterSpacing:1,
+         textTransform:'uppercase',
+    },
+    Container:{
          flexDirection:'row',
          flexWrap:'wrap',
-         gap:15,
-         
-
+         justifyContent:'center',
+         gap:SPACING.md,
+         paddingHorizontal:SPACING.lg,
+         paddingTop:SPACING.lg,
     },
     StackConatiner:{
             flexDirection:'column',
             justifyContent:'space-around',
             alignItems:'center',
-             
-             width:'100%',
-             backgroundColor:'#1e1b1b',
-             marginBottom:20,
-                padding:15,
-                height:180,
-                borderRadius:20,
-                width:160,
-                borderColor:'#484141',
+             backgroundColor:COLORS.surfaceElevated,
+             padding:SPACING.lg,
+                height:170,
+                borderRadius:RADIUS.lg,
+                width:158,
+                borderColor:COLORS.border,
                 borderWidth:1,
-                shadowColor:'#000',
-                shadowOffset:{width:0,height:10},
-                shadowOpacity:0.5,
-                shadowRadius:15,
-                elevation:8,
-                
+                ...shadow('#000',0.5,15,8,{width:0,height:10}),
     },
     Text:{
-         color:'#ffff',
+         color:COLORS.textPrimary,
          fontSize:16,
-            fontWeight:'bold',
+            fontWeight:'700',
             textAlign:'center',
-            fontFamily:'helvetica',
-            marginBottom:0,
+            fontFamily:'Helvetica',
            textTransform:'uppercase',
            letterSpacing:1,
-            margin:0,
 
     },
     Icon:{
-         fontSize:27,
-         marginBottom:10,
+         marginBottom:SPACING.sm,
     },
     Subtitle:{
-         fontFamily:'helvetica',
-         color:'#888',
+         fontFamily:'Helvetica',
+         color:COLORS.textSecondary,
          fontSize:10,
          textAlign:'center',
-        textTransform:'helvetica',
+        textTransform:'uppercase',
         letterSpacing:1.5,
-        marginBottom:5,
-        
+        marginBottom:SPACING.xs,
     },
-   
+
 })
 export default StackContainer;//Exportamos el componente para usarlo en la pantalla de inicio,para mostrar la racha y los puntos_ranking

@@ -3,11 +3,11 @@ import React, { useEffect,useRef,useState } from "react";
 import {View,Text,StyleSheet,SafeAreaView,ActivityIndicator,FlatList,Platform,StatusBar, TouchableOpacity} from 'react-native';
 import Header from "../components/HeaderComponent";
 import Footer from "../components/Footer";
-import YouTubePlayer from 'react-native-youtube-iframe';
 import { getEjerciciosDeRutina } from "../services/services";
 import Button from "../components/Button";
 import EjercicioCard from "../components/EjercicioCard";
 import { registrarSesionHistorial } from "../services/services";
+import { COLORS, SPACING } from "../theme";
 
 
 
@@ -87,11 +87,11 @@ const Ejercicios=({route})=>{
   return match ? match[1] : null;
 };
          
-            if(loading){    
+            if(loading){
                 return(
                         <SafeAreaView style={styles.Container}>
                                 <Header/>
-                                <ActivityIndicator size="large" color="#0000ff" style={styles.ActivityIndicatorStyle}/>
+                                <ActivityIndicator size="large" color={COLORS.primary} style={styles.ActivityIndicatorStyle}/>
                                 <Footer/>
                         </SafeAreaView>
                 )
@@ -103,14 +103,17 @@ const Ejercicios=({route})=>{
                                 <FlatList
                                         data={ejercicios}
                                         contentContainerStyle={styles.flatListContent}
+                                        showsVerticalScrollIndicator={false}
                                         keyExtractor={(item)=>item.id_rutina_ejercicio.toString()}
                                         renderItem={({item})=>(
-                                                <EjercicioCard item={item} onCompletado={handleCompletado}/>   
-                                        
+                                                <EjercicioCard item={item} onCompletado={handleCompletado}/>
+
                                         )}
                                 />
                                 {sesionesCompletadas===ejercicios.length && ejercicios.length>0 && (
-                                        <Button title="Registrar sesión" onPress={handleSesiones} />
+                                        <View style={styles.RegistrarContainer}>
+                                                <Button title="Registrar sesión" onPress={handleSesiones} />
+                                        </View>
                                 )}
                                 <Footer/>
                         </SafeAreaView>
@@ -121,34 +124,22 @@ const Ejercicios=({route})=>{
 const styles=StyleSheet.create({
         Container:{
                 flex:1,
-                backgroundColor:'#000000',
+                backgroundColor:COLORS.background,
                  paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
 
         },
-        ActivityIndicatorStyle:{    
+        ActivityIndicatorStyle:{
                 flex:1,
                 justifyContent:'center',
-                alignItems:'center',        
+                alignItems:'center',
 
         },
         flatListContent:{
-                padding:20,
+                padding:SPACING.xl,
         },
-        EjercicioCard:{
-                backgroundColor:'#000000',
-                borderRadius:10,
-                padding:15,
-                marginBottom:15,
-        },
-        EjercicioName:{
-                fontSize:18,
-                fontWeight:'bold',
-                color:'#ffffff',
-                marginBottom:5,
-        },
-        EjercicioDescription:{
-                fontSize:14,
-                color:'#cccccc',
+        RegistrarContainer:{
+                paddingHorizontal:SPACING.xl,
+                paddingBottom:SPACING.lg,
         },
 })
 export default Ejercicios;

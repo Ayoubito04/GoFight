@@ -1,5 +1,5 @@
 import react from 'react';
-import {View,Text,TextInput,TouchableOpacity,StyleSheet,ScrolView, ScrollView,ActivityIndicator,KeyboardAvoidingView} from 'react-native';
+import {View,Text,TouchableOpacity,StyleSheet,ActivityIndicator,KeyboardAvoidingView} from 'react-native';
 
 import {useState,useEffect} from 'react';
 import {registerUser} from '../services/services';
@@ -9,6 +9,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Ionicons} from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ErrorMsg from '../components/ErrorMsg';
+import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 
 
 
@@ -39,7 +40,7 @@ export default function Register({}){
          if(laoding){
             return(
                 <View style={styles.LoadingContainer}>
-                    <ActivityIndicator size="large" color="#ff0000"/>
+                    <ActivityIndicator size="large" color={COLORS.primary}/>
                 </View>
             )
 
@@ -115,26 +116,14 @@ const styles=StyleSheet.create({
         flex:1,
         justifyContent:'center',
         alignItems:'center',
-        padding:20,
-        backgroundColor:'black',
-        shadowColor:'rgba(255,0,0,0.5)',
-        shadowOffset:{width:0,height:2},
-        shadowOpacity:0.5,
-        shadowRadius:12,
-        elevation:5,
-        
-        
+        padding:SPACING.xl,
+        backgroundColor:COLORS.background,
       },
       LoadingContainer:{
          flex:1,
          justifyContent:'center',
          alignItems:'center',
-         backgroundColor:'black',
-      },
-      IconStyle:{
-        marginLeft:10,
-        marginTop:10,
-        color:'red',
+         backgroundColor:COLORS.background,
       },
       FlexView:{
         flexDirection:'row',
@@ -143,103 +132,56 @@ const styles=StyleSheet.create({
       },
       RegistrarseText:{
         fontSize:20,
-        fontWeight:'bold',
-        marginBottom:20,
-        color:'red',
-        paddingTop:20,
+        fontWeight:'700',
+        marginBottom:SPACING.xl,
+        color:COLORS.primary,
+        paddingTop:SPACING.xl,
         textAlign:'center',
-        textShadowColor:'rgba(255,0,0,0.5)',
+        textShadowColor:'rgba(255, 34, 51,0.5)',
         },
       TitleStyle:{
-        fontSize:24,
-        fontWeight:'700',
-        color:'#FF2233',
-        marginBottom:20,
-        marginTop:20,
-        margin:0,
-        alignContent:'center',
+        fontSize:26,
+        fontWeight:'800',
+        color:COLORS.primary,
+        marginBottom:SPACING.xl,
+        marginTop:SPACING.xl,
         textAlign:'center',
-          textShadowColor:'rgba(255,34,51,0.5)',
-          textShadowOffset:{width:2,height:2},
-          textShadowRadius:10,
+          textShadowColor:COLORS.primary,
+          textShadowOffset:{width:1,height:1},
+          textShadowRadius:6,
           textTransform:'uppercase',
           letterSpacing:3,
-          textShadowColor:'#FF2233',
-          textShadowOffset:{width:1,height:1},
-          textShadowRadius:3,
-
-
-      },
-      ViewStyle:{
-        width:'100%',
-        marginBottom:20,
-        padding:20,
-        borderRadius:10,
-        backgroundColor:'transparent',
-        borderColor:'rgba(255,0,0,0.25)',
-
-
-        
       },
       FormStyle:{
         width:'100%',
-        marginBottom:20,
+        marginBottom:SPACING.xl,
         padding:24,
-        borderRadius:14,
-        backgroundColor:'#0F0F0F',
-        borderColor:'rgba(255,0,0,0.25)',
+        borderRadius:RADIUS.xl,
+        backgroundColor:COLORS.surfaceAlt,
+        borderColor:'rgba(255, 34, 51,0.25)',
         borderWidth:1,
-        boxShadow:'5px 20px 15px rgba(255,0,0,0.2)',
-        shadowColor:'#FF2233',
-        shadowOffset:{width:0,height:4},
-        shadowOpacity:0.5,
-        shadowRadius:10,
-        elevation:5,
-
-
-      },
-
-      TextInput:{
-        width:'100%',
-        height:40,
-        borderColor:'gray',
-        borderWidth:1,
-        marginBottom:10,
-        borderRadius:5,
-        paddingHorizontal:10,
-
-
-      },
-      ButtonStyle:{
-        width:'100%',
-        height:40,
-        backgroundColor:'#007bff',
-        justifyContent:'center',
-        alignItems:'center',
-        borderRadius:5,
+        ...shadow(COLORS.primary,0.5,10,5,{width:0,height:4}),
       },
       Mensajes:{
-        color:'red',
-        marginBottom:10,
+        color:COLORS.danger,
+        marginBottom:SPACING.md,
         textAlign:'center',
-        borderColor:'red',
+        borderColor:COLORS.danger,
         borderWidth:1,
-        padding:10,
-        borderRadius:5,
-        top:10,
-        
+        padding:SPACING.md,
+        borderRadius:RADIUS.sm,
       },
       LinkStyle:{
        fontSize:14,
-        color:'#555555',
+        color:COLORS.textSecondary,
         alignItems:'center',
         justifyContent:'center',
         textAlign:'center',
-        marginTop:20,
+        marginTop:SPACING.xl,
 
       },
       IniciarSesionText:{
-        color:'#127ccd',
+        color:COLORS.info,
         fontWeight:'bold',
         textDecorationLine:'underline',
 

@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getRutinas, getUserProfile, getCatalogoEjercicios, crearRutina,EliminarRutina} from "../services/services";
 import Button from "../components/Button.js";
+import Footer from "../components/Footer.js";
+import { COLORS, RADIUS, SPACING, difficultyColor, shadow } from "../theme";
 
 const MisRutinas = () => {
     const [rutinas, setRutinas] = useState([]);
@@ -101,7 +103,7 @@ const MisRutinas = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
             <Modal visible={modalVisible} animationType="fade" transparent={true}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
@@ -127,13 +129,13 @@ const MisRutinas = () => {
                                         style={[styles.ejercicioItem, isSelected && styles.ejercicioSelected]}
                                         onPress={() => handleSeleccionarEjercicio(item.id_ejercicio)}
                                     >
-                                        <Text style={[styles.ejercicioText, isSelected && {color: '#fff'}]}>
+                                        <Text style={[styles.ejercicioText, isSelected && {color: COLORS.onPrimary}]}>
                                             {item.nombre}
                                         </Text>
-                                        <Ionicons 
-                                            name={isSelected ? "checkmark-circle" : "add-circle-outline"} 
-                                            size={22} 
-                                            color={isSelected ? "#fff" : "#d30a0a"} 
+                                        <Ionicons
+                                            name={isSelected ? "checkmark-circle" : "add-circle-outline"}
+                                            size={22}
+                                            color={isSelected ? COLORS.onPrimary : COLORS.primary}
                                         />
                                     </TouchableOpacity>
                                 );
@@ -152,66 +154,61 @@ const MisRutinas = () => {
                 </View>
             </Modal>
 
-            <Text style={styles.title}>MIS RUTINAS</Text>
-            
-            <FlatList 
-                data={rutinas}
-                keyExtractor={(item) => item.id_rutina.toString()}
-                ListEmptyComponent={
-                    <View style={styles.MessageContainer}>
-                        <Text style={styles.noRutinas}>No tienes rutinas creadas.</Text>
-                    </View>
-                }
-                renderItem={({ item }) => (
-                    <View style={styles.rutinaContainer}>
-                        <Text style={styles.rutinaNombre}>{item.nombre_rutina}</Text>
-                        <View style={styles.ejerciciosDificultadView}>
-                            <Text style={[
-                                {
+            <View style={styles.container}>
+                <Text style={styles.title}>MIS RUTINAS</Text>
 
-                                    borderColor: item.dificultad === 'Fácil' ? '#4caf50' : item.dificultad === 'Intermedio' ? '#ff9800' : '#f44336',
-                                    borderWidth: 1,
-                                    padding: 4,
-                                    borderRadius: 4,
-                                    color: item.dificultad === 'Fácil' ? '#4caf50' : item.dificultad === 'Intermedio' ? '#ff9800' : '#f44336',
-                                    fontSize: 12,
-                                    width: 80,
-                                    textAlign: 'center',
-                                    boxShadow: `0 0 8px ${item.dificultad === 'Fácil' ? 'rgba(76, 175, 80, 0.5)' : item.dificultad === 'Intermedio' ? 'rgba(255, 152, 0, 0.5)' : 'rgba(244, 67, 54, 0.5)'}`,
-                                    bottom: 4,
-                                    alignSelf: 'flex-start',
-                                    fontWeight: '600',
-                                }
-                              
-
-                                
-                            ]}>{item.dificultad}</Text>
-                           <Button title="Eliminar" onPress={() => handleEliminarRutina(item.id_rutina)} />
+                <FlatList
+                    data={rutinas}
+                    keyExtractor={(item) => item.id_rutina.toString()}
+                    contentContainerStyle={styles.listContent}
+                    ListEmptyComponent={
+                        <View style={styles.MessageContainer}>
+                            <Text style={styles.noRutinas}>No tienes rutinas creadas.</Text>
                         </View>
-                    </View>
-                )}
-            />
+                    }
+                    renderItem={({ item }) => {
+                        const color = difficultyColor(item.dificultad);
+                        return (
+                        <View style={styles.rutinaContainer}>
+                            <Text style={styles.rutinaNombre}>{item.nombre_rutina}</Text>
+                            <View style={styles.ejerciciosDificultadView}>
+                                <Text style={[styles.dificultadTag, { borderColor: color, color }]}>{item.dificultad}</Text>
+                                <Button title="Eliminar" variant="secondary" onPress={() => handleEliminarRutina(item.id_rutina)} />
+                            </View>
+                        </View>
+                        );
+                    }}
+                />
 
-            <Button title="CREAR NUEVA RUTINA" onPress={() => setModalVisible(true)} />
+                <Button title="CREAR NUEVA RUTINA" onPress={() => setModalVisible(true)} />
+            </View>
+
+            <Footer />
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        padding: 20, 
-        backgroundColor: '#060606'
-
+    safeArea: {
+        flex: 1,
+        backgroundColor: COLORS.background,
+        justifyContent: 'space-between',
     },
-    title: {   
-        fontSize: 28, 
-        fontWeight: '800', 
-        marginBottom: 24,
-        color: '#ff3333',
+    container: {
+        flex: 1,
+        padding: SPACING.xl,
+    },
+    listContent: {
+        paddingBottom: SPACING.md,
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: '800',
+        marginBottom: SPACING.lg,
+        color: COLORS.primary,
         textAlign: 'center',
         letterSpacing: 3,
-        textShadowColor: 'rgba(255, 51, 51, 0.3)',
+        textShadowColor: 'rgba(255, 34, 51, 0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 8
         },
@@ -222,97 +219,109 @@ const styles = StyleSheet.create({
          },
     modalContent: {   width: '90%',
         maxHeight: '85%',
-        backgroundColor: '#141414',
-        borderRadius: 24,
-        padding: 24, 
+        backgroundColor: COLORS.surfaceAlt,
+        borderRadius: RADIUS.xl,
+        padding: 24,
         borderWidth: 1,
-        borderColor: 'rgba(255, 51, 51, 0.15)',
-        shadowColor: '#ff3333',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        elevation: 10
+        borderColor: 'rgba(255, 34, 51, 0.15)',
+        ...shadow(COLORS.primary,0.1,20,10,{width:0,height:0}),
          },
-    modalTitle: {  fontSize: 24, 
-        fontWeight: '700', 
-        color: '#fff',
-        marginBottom: 24, 
+    modalTitle: {  fontSize: 22,
+        fontWeight: '700',
+        color: COLORS.textPrimary,
+        marginBottom: SPACING.lg,
         textAlign: 'center',
         letterSpacing: 1
         },
-    input: { backgroundColor: '#1a1a1a',
-        color: '#fff',
-        padding: 16, 
-        borderRadius: 12,
-        marginBottom: 20, 
+    input: { backgroundColor: COLORS.surfaceElevated,
+        color: COLORS.textPrimary,
+        padding: SPACING.lg,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING.lg,
         fontSize: 16,
         borderWidth: 1,
-        borderColor: '#2a2a2a',
+        borderColor: COLORS.border,
         fontWeight: '500'
 
         },
-    label: {color: '#888',
-        fontSize: 13, 
+    label: {color: COLORS.textSecondary,
+        fontSize: 13,
         fontWeight: '700',
-        marginBottom: 12, 
+        marginBottom: SPACING.md,
         textTransform: 'uppercase',
         letterSpacing: 1.5
          },
     flatList: {  maxHeight: 320,
-        marginBottom: 20 
+        marginBottom: SPACING.lg
         },
     ejercicioItem: {   flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 16, 
-        backgroundColor: '#1a1a1a',
-        borderRadius: 12, 
-        marginBottom: 8,
+        padding: SPACING.lg,
+        backgroundColor: COLORS.surfaceElevated,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING.sm,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#252525' },
+        borderColor: COLORS.border },
 
-    ejercicioSelected: { backgroundColor: '#d30a0a'
+    ejercicioSelected: { backgroundColor: COLORS.primary
 
      },
     ejercicioText: { color: '#ddd',
-         fontSize: 15 
+         fontSize: 15
         },
     buttonRow: { flexDirection: 'row',
          justifyContent: 'space-between',
-          marginTop: 10 
+          marginTop: SPACING.sm
         },
-    btnPrimario: { backgroundColor: '#d30a0a',
-         padding: 15,
-          borderRadius: 10,
-           width: '48%', 
+    btnPrimario: { backgroundColor: COLORS.primary,
+         padding: SPACING.lg,
+          borderRadius: RADIUS.md,
+           width: '48%',
            alignItems: 'center'
          },
-    btnPrimarioText: { color: '#fff'
+    btnPrimarioText: { color: COLORS.onPrimary
         , fontWeight: 'bold',
-         fontSize: 16 
+         fontSize: 16
         },
-    btnSecundario: { backgroundColor: '#333',
-         padding: 15,
-          borderRadius: 10,
-           width: '48%', 
+    btnSecundario: { backgroundColor: COLORS.surfaceElevated,
+         padding: SPACING.lg,
+          borderRadius: RADIUS.md,
+           width: '48%',
            alignItems: 'center'
          },
     btnSecundarioText: { color: '#ccc',
          fontWeight: 'bold',
-         fontSize: 16 
+         fontSize: 16
         },
-    rutinaContainer: { marginBottom: 15,
-         padding: 20,
-          backgroundColor: '#121212',
-           borderRadius: 15,
+    rutinaContainer: { marginBottom: SPACING.md,
+         padding: SPACING.xl,
+          backgroundColor: COLORS.surface,
+           borderRadius: RADIUS.lg,
             borderWidth: 1,
-             borderColor: '#222'
+             borderColor: COLORS.border
              },
-    rutinaNombre: { fontSize: 18, color: '#fff',
+    rutinaNombre: { fontSize: 18, color: COLORS.textPrimary,
          fontWeight: 'bold',
-          marginBottom: 4 
+          marginBottom: 4
         },
-    ejerciciosDificultadView: { marginTop: 4 },
+    ejerciciosDificultadView: {
+        marginTop: SPACING.sm,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: SPACING.sm,
+    },
+    dificultadTag: {
+        borderWidth: 1,
+        borderRadius: RADIUS.sm,
+        paddingHorizontal: SPACING.sm,
+        paddingVertical: 4,
+        fontSize: 12,
+        fontWeight: '600',
+        textAlign: 'center',
+        alignSelf: 'flex-start',
+    },
     countText: { color: '#353131',
          fontSize: 12, fontWeight: '600'
          },

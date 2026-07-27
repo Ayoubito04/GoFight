@@ -16,8 +16,8 @@ import { getTotalCaloriasQuemadas } from '../services/services';
 import { getUserProfile } from '../services/services';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import { useRef } from 'react';
+import { COLORS, SPACING } from '../theme';
 //Para eso importamos el servicio para obtener usuarios,ya que necsitamos obtener el rol del usuario,que nos tendría que dar acceso a ese panel
 
 
@@ -75,7 +75,7 @@ const Home=()=>{
      if(loading){
          return(
                <View style={style.ActivityIndicatorStyle}>
-                    <ActivityIndicator size="large" color="#ff0000"/>
+                    <ActivityIndicator size="large" color={COLORS.primary}/>
                </View>
          )
      }
@@ -83,21 +83,20 @@ const Home=()=>{
           return(
                <SafeAreaView style={style.Container}>
                      <Header/>
-                      <ScrollView>
+                      <ScrollView contentContainerStyle={style.ScrollContent}>
                           <StackContainer datos={gamificaciones}/>
                               <BarraProgreso actual={caloriasQuemadas} objetivo={300} unidad="kcal"
 
                               />
                               {
                                    isAdmin && (
-                                        <View style={{marginTop:20,alignItems:'center', flexDirection:'row', justifyContent:'center'}}>
-                                             <Button title="Panel de administración" onPress={()=>navigation.navigate('GestorUsuariosAdmin')}/>
-                                      
+                                        <View style={style.AdminButtonContainer}>
+                                             <Button title="Panel de administración" variant="secondary" onPress={()=>navigation.navigate('GestorUsuariosAdmin')}/>
                                         </View>
                                    )
                               }
                       </ScrollView>
-                      
+
                      <Footer/>
                 </SafeAreaView>
           )
@@ -109,66 +108,20 @@ const style=StyleSheet.create({
           flex:1,
           justifyContent:'center',
           alignItems:'center',
-          backgroundColor:'#080808'
-
-
+          backgroundColor:COLORS.background,
      },
      Container:{
           flex:1,
           justifyContent:'space-between',
-          backgroundColor:'#080808'
-
-          
-         
-
-          
+          backgroundColor:COLORS.background,
      },
-     StacksConatainer:{
-          flexDirection:'row',
-          justifyContent:'space-around',
+     ScrollContent:{
+          paddingBottom:SPACING.xl,
+     },
+     AdminButtonContainer:{
+          marginTop:SPACING.xl,
+          paddingHorizontal:SPACING.lg,
           alignItems:'center',
-          padding:10,
-          gap:10,
-      
-          gap:10,
-          flexWrap:'wrap'
-         
-          
-          
-
-     },
-     StackStats:{
-          flexDirection:'row',
-          justifyContent:'space-around',
-          alignItems:'center',
-          padding:10,
-          gap:10,
-          backgroundColor:'white',
-          
-          borderWidth:1,
-          height:200,
-          borderRadius:5,
-          width:200,
-          backgroundColor:'#1a1a1a',
-          elevation:5,
-          boxShadow:'rgba(255,0,0,0.5)',
-          shadowColor:'rgba(255,0,0,0.5)',
-          shadowOffset:{width:0,height:2},
-          shadowOpacity:0.5,
-          shadowRadius:12,
-          borderColor:'rgba(70, 34, 34, 0.5)',
-
-
-          
-     },
-     TextStyle:{
-          fontSize:18,
-          fontWeight:'bold',
-          color:'white',
-          textShadowColor:'rgba(255, 0, 0, 0.5)',
-          textShadowOffset:{width:0,height:2},
-          textShadowRadius:12,
-          
      },
 })
 export default Home;

@@ -1,9 +1,13 @@
 //Aquí vamos a meter el ranking de los juegadores con sus puntos y demás, para que puedan ver su posición en el ranking mundial
 import React, { useEffect, useState } from 'react';
 import { getRanking } from '../services/services';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TextInputComponent from '../components/TextInput';
+import Header from '../components/HeaderComponent';
+import Footer from '../components/Footer';
+import { COLORS, RADIUS, SPACING, shadow } from '../theme';
+
 const Ranking=()=>{
     const [ranking,setRanking]=useState([]);
     const [loading,setLoading]=useState(true);
@@ -26,91 +30,119 @@ const Ranking=()=>{
     }, []);
     const UsuarioFiltrado=ranking.filter(jugador=>jugador.usuarios.nombre.toLowerCase().includes(searchUser.toLowerCase()));
 
+    const medalStyle=(index)=>{
+        if(index===0) return {backgroundColor:'rgba(236,193,18,0.12)', borderColor: COLORS.gold, borderWidth: 1};
+        if(index===1) return {backgroundColor:'rgba(192,192,192,0.1)', borderColor: COLORS.silver, borderWidth: 1};
+        if(index===2) return {backgroundColor:'rgba(205,127,50,0.12)', borderColor: COLORS.bronze, borderWidth: 1};
+        return {};
+    };
+
     if(loading){
-        return <View><Text>Cargando ranking...</Text></View>;
+        return (
+            <View style={styles.stateContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary}/>
+            </View>
+        );
     }
     if(error){
-        return <View><Text>Error: {error}</Text></View>;
+        return (
+            <View style={styles.stateContainer}>
+                <Text style={styles.errorText}>Error: {error}</Text>
+            </View>
+        );
     }
     return (
        <SafeAreaView style={styles.container}>
+        <Header/>
         <Text style={styles.title}>Ranking de luchadores</Text>
-        <TextInputComponent placeholder="Buscar jugador..." style={{marginBottom: 20}} value={searchUser} onChangeText={setSearchUser} />
-        <ScrollView>
-            {UsuarioFiltrado.map((jugador,index)=>(
-                <View key={index} style={
-                    [
-                        styles.jugadorContainer,
-                        index === 0 ? {backgroundColor: '#ecc112', shadowColor: '#ecc112', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.8, shadowRadius: 12, elevation: 6 ,borderColor: '#ecc112',borderWidth: 2} : {}, 
-                        index === 1 ? {backgroundColor: '#c0c0c0', shadowColor: '#a9a9a9', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.8, shadowRadius: 4, elevation: 6, borderColor: '#a9a9a9',borderWidth: 2} : {}, 
-                        index === 2 ? {backgroundColor: '#cd7f32', shadowColor: '#8b4513', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.8, shadowRadius: 4, elevation: 6, borderColor: '#8b4513',borderWidth: 2} : {}, 
-                    ]
-                }>
-                    <Text style={styles.jugadorNombre}>{jugador.usuarios.nombre}</Text>
-                    <Text style={styles.jugadorPuntos}>{jugador.puntos_ranking} puntos</Text>
-                    <Text style={styles.jugadorPuntos}> {index + 1}</Text>
-        
-                    
+        <View style={styles.searchWrapper}>
+            <TextInputComponent placeholder="Buscar jugador..." value={searchUser} onChangeText={setSearchUser} iconName="search"/>
+        </View>
+        <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+            {UsuarioFiltrado.length===0 ? (
+                <Text style={styles.emptyText}>No se encontraron jugadores.</Text>
+            ) : UsuarioFiltrado.map((jugador,index)=>(
+                <View key={index} style={[styles.jugadorContainer, medalStyle(index)]}>
+                    <Text style={styles.jugadorPosicion}>#{index + 1}</Text>
+                    <Text style={styles.jugadorNombre} numberOfLines={1}>{jugador.usuarios.nombre}</Text>
+                    <Text style={styles.jugadorPuntos}>{jugador.puntos_ranking} pts</Text>
                 </View>
             ))}
         </ScrollView>
+        <Footer/>
        </SafeAreaView>
     );
 }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
-        backgroundColor: '#000000',
-        borderBlockColor: '#484141',
-        borderWidth: 1,
-        borderRadius: 8,
-        shadowColor: '#484141',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 4,
-        elevation: 5,
+        backgroundColor: COLORS.background,
+    },
+    stateContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.background,
+    },
+    errorText: {
+        color: COLORS.danger,
+        fontSize: 15,
+        fontWeight: '600',
     },
     title: {
-        fontSize: 28, 
-        fontWeight: '800', 
-        marginBottom: 24,
-        color: '#ff3333',
+        fontSize: 22,
+        fontWeight: '800',
+        marginTop: SPACING.lg,
+        marginBottom: SPACING.md,
+        color: COLORS.primary,
         textAlign: 'center',
         letterSpacing: 3,
-        textShadowColor: 'rgba(255, 51, 51, 0.3)',
+        textShadowColor: 'rgba(255, 34, 51, 0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 8
-
-
+    },
+    searchWrapper: {
+        paddingHorizontal: SPACING.lg,
+    },
+    listContent: {
+        paddingHorizontal: SPACING.lg,
+        paddingBottom: SPACING.xl,
+    },
+    emptyText: {
+        color: COLORS.textMuted,
+        textAlign: 'center',
+        marginTop: SPACING.xl,
+        fontSize: 14,
     },
     jugadorContainer: {
-   flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
-        padding: 16,
-        borderRadius: 16,
-        backgroundColor: '#121212',
+        marginBottom: SPACING.sm,
+        padding: SPACING.lg,
+        borderRadius: RADIUS.lg,
+        backgroundColor: COLORS.surface,
         borderLeftWidth: 4,
-        borderLeftColor: '#d30a0a',
-        shadowColor: '#d30a0a',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 10,
-        elevation: 6,
-
+        borderLeftColor: COLORS.primary,
+        gap: SPACING.md,
+        ...shadow(COLORS.primary, 0.15, 10, 6, { width: 0, height: 4 }),
+    },
+    jugadorPosicion: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: COLORS.textSecondary,
+        width: 32,
     },
     jugadorNombre: {
-          fontSize: 16,
-        color: '#e0e0e0',
+        flex: 1,
+        fontSize: 16,
+        color: COLORS.textPrimary,
         letterSpacing: 0.5,
         fontWeight: '700',
     },
     jugadorPuntos: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '700',
-        color: '#e0e0e0',
+        color: COLORS.textPrimary,
         letterSpacing: 0.5,
     },
 

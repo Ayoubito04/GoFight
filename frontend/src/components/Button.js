@@ -1,37 +1,75 @@
 import React from 'react';
-import {TouchableOpacity,Text,StyleSheet} from 'react-native';
-import { useState } from 'react';
-const  Button=({title,onPress})=>{
-    const [Hover,setHover]=useState(false);
-    //Definimos el hook de hover,para definir el cambio de estado
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 
-    //En componentes vamos a definir como van a ser todos los buttons de la aplicación
-    return(
-        <TouchableOpacity onPress={onPress} onPressIn={()=>setHover(true)} onPressOut={()=>setHover(false)} style={styles.ButtonStyle}>
-            <Text style={styles.ButtonStyle}>{title}</Text>
-            
-
+//Definimos como van a ser todos los botones de la aplicación,con soporte de variante (primary/secondary/ghost) y estado deshabilitado
+const Button = ({ title, onPress, variant = 'primary', disabled = false, style }) => {
+    return (
+        <TouchableOpacity
+            onPress={onPress}
+            disabled={disabled}
+            activeOpacity={0.75}
+            style={[
+                styles.base,
+                variant === 'secondary' && styles.secondary,
+                variant === 'ghost' && styles.ghost,
+                disabled && styles.disabled,
+                style,
+            ]}
+        >
+            <Text
+                style={[
+                    styles.text,
+                    variant === 'secondary' && styles.textSecondary,
+                    variant === 'ghost' && styles.textGhost,
+                ]}
+            >
+                {title}
+            </Text>
         </TouchableOpacity>
-    )
+    );
+};
 
-}
-const styles=StyleSheet.create({
-    ButtonStyle:{
-        backgroundColor:'#f80404',
-        padding:10,
-        borderRadius:5,
-        color:'white',
-        textAlign:'center',
-        fontSize:16,
-        fontWeight:'bold',
-        boxShadow:'0 0 10px rgba(248, 4, 4, 0.5)',
-        shadowColor:'rgba(248, 4, 4, 0.5)',
-        shadowOffset:{width:0,height:2},
-        shadowOpacity:0.8,
-        shadowRadius:5,
-        elevation:5,
-            transform: [{ scale: 1 }],
+const styles = StyleSheet.create({
+    base: {
+        backgroundColor: COLORS.primary,
+        paddingVertical: SPACING.md,
+        paddingHorizontal: SPACING.lg,
+        borderRadius: RADIUS.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...shadow(COLORS.primaryGlow, 0.5, 10, 5, { width: 0, height: 2 }),
     },
-
-})
+    secondary: {
+        backgroundColor: COLORS.surfaceElevated,
+        borderWidth: 1,
+        borderColor: COLORS.borderStrong,
+        shadowOpacity: 0,
+        elevation: 0,
+    },
+    ghost: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: COLORS.primary,
+        shadowOpacity: 0,
+        elevation: 0,
+    },
+    disabled: {
+        opacity: 0.5,
+    },
+    text: {
+        color: COLORS.onPrimary,
+        textAlign: 'center',
+        fontSize: 15,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+        textTransform: 'uppercase',
+    },
+    textSecondary: {
+        color: COLORS.textPrimary,
+    },
+    textGhost: {
+        color: COLORS.primary,
+    },
+});
 export default Button;
