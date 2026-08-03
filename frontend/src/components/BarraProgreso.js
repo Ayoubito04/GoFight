@@ -3,9 +3,7 @@ import React, { useRef } from "react";
 import {View,Text,StyleSheet,Animated,ActivityIndicator} from 'react-native';//Importamos Animated para crear la animación de la barra de progreso
 import { useState,useEffect } from "react";
 import {Ionicons} from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import {LinearGradient} from 'expo-linear-gradient';
-import { COLORS, RADIUS, SPACING } from "../theme";
+import { COLORS, RADIUS, SPACING, shadow } from "../theme";
 
 
 
@@ -47,30 +45,23 @@ const BarraProgreso=({actual,objetivo,unidad})=>{
         else{
             return(
                    <View style={styles.Container}>
-                        <View style={styles.TextContainer}>
-                           <View style={styles.RowStyle}>
-                             <Ionicons name="flame" size={18} color="#ffae00" />
-                             <Text style={styles.TextStyle}>Actual: {actual} {unidad}</Text>
-                           </View>
-                           <View style={styles.RowStyle}>
-                                <MaterialCommunityIcons name="target" size={18} color={COLORS.primary} />
-                                <Text style={styles.TextStyle}>Objetivo: {objetivo} {unidad}</Text>
-                           </View>
+                        <View style={styles.HeaderRow}>
+                             <Ionicons name="flame" size={16} color={COLORS.primary} />
+                             <Text style={styles.LabelText}>Calorías quemadas</Text>
                         </View>
-                        <View style={styles.barraProgresoContainer}>
-                               <Animated.View style={{ width, height: '100%' }}>
-    <LinearGradient
-      colors={[COLORS.primaryDark, COLORS.primary, '#FFE6E6']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      style={{ flex: 1, borderRadius: RADIUS.pill }}
-    />
-  </Animated.View>
-
+                        <View style={styles.ValueRow}>
+                             <Text style={styles.PercentText}>{porcentajeCaloriasQuemadas.toFixed(0)}%</Text>
+                             <Text style={styles.SeparatorText}> · </Text>
+                             <Text style={styles.ValueText}>{actual} de {objetivo} {unidad}</Text>
                         </View>
-                         <View style={styles.SubtitleStyleContainer}>
-                             <Text style={styles.SubtitleStyle}>Progreso: {porcentajeCaloriasQuemadas.toFixed(0)}%</Text>
-                           </View>
+                        <View style={styles.ScaleRow}>
+                             <Text style={styles.ScaleText}>0</Text>
+                             <Text style={styles.ScaleText}>{Math.round(objetivo/2)}</Text>
+                             <Text style={styles.ScaleText}>{objetivo}</Text>
+                        </View>
+                        <View style={styles.TrackOuter}>
+                               <Animated.View style={[styles.TrackFill,{ width }]}/>
+                        </View>
                    </View>
 
             )
@@ -84,50 +75,70 @@ const styles=StyleSheet.create({
         width: '90%',
         alignSelf: 'center',
         marginVertical: SPACING.md,
-    },
-    barraProgresoContainer:{
-        width: '100%',
-        height: 10,
-        backgroundColor: COLORS.surfaceElevated,
-        borderRadius: RADIUS.pill,
-        overflow: 'hidden',
+        backgroundColor: COLORS.surfaceAlt,
+        borderRadius: RADIUS.xl,
         borderWidth: 1,
-        borderColor: COLORS.border,
+        borderColor: 'rgba(255, 34, 51, 0.2)',
+        padding: SPACING.lg,
     },
-    TextStyle:{
-        fontSize:11,
-        fontWeight: '700',
-        color: COLORS.textPrimary,
-        letterSpacing: 1,
-        textTransform: 'uppercase',
-    },
-    RowStyle:{
+    HeaderRow:{
         flexDirection: 'row',
         alignItems: 'center',
         gap: SPACING.xs,
-    },
-    TextContainer:{
-        flexDirection:'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: SPACING.md,
-        borderRadius: RADIUS.md,
-        backgroundColor: COLORS.surfaceAlt,
-        width: '100%',
         marginBottom: SPACING.sm,
-        borderColor: 'rgba(255, 34, 51, 0.15)',
-        borderWidth: 1,
     },
-    SubtitleStyleContainer:{
-        marginTop: SPACING.sm,
-        alignItems:'center',
-    },
-    SubtitleStyle:{
-        fontSize: 11,
+    LabelText:{
+        fontSize: 12,
+        fontWeight: '700',
         color: COLORS.textSecondary,
-        letterSpacing: 1,
-        fontWeight: 'bold',
-    }
+        letterSpacing: 0.5,
+    },
+    ValueRow:{
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        marginBottom: SPACING.md,
+    },
+    PercentText:{
+        fontSize: 26,
+        fontWeight: '800',
+        color: COLORS.primary,
+        letterSpacing: 0.3,
+    },
+    SeparatorText:{
+        fontSize: 18,
+        fontWeight: '800',
+        color: COLORS.textPrimary,
+    },
+    ValueText:{
+        fontSize: 16,
+        fontWeight: '700',
+        color: COLORS.textPrimary,
+    },
+    ScaleRow:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: SPACING.xs,
+        paddingHorizontal: 2,
+    },
+    ScaleText:{
+        fontSize: 11,
+        fontWeight: '600',
+        color: COLORS.textMuted,
+    },
+    TrackOuter:{
+        width: '100%',
+        height: 34,
+        borderRadius: RADIUS.pill,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        padding: 4,
+    },
+    TrackFill:{
+        height: '100%',
+        borderRadius: RADIUS.pill,
+        backgroundColor: COLORS.primary,
+        ...shadow(COLORS.primaryGlow, 0.9, 10, 6, {width:0,height:0}),
+    },
 
 })
 export default BarraProgreso;
