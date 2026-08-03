@@ -2,12 +2,16 @@
 import React, { useEffect, useState,useRef} from 'react';
 import {View,Text,StyleSheet} from 'react-native';
 import Button from './Button';
-import {Video} from 'expo-av';
-import { COLORS, RADIUS, SPACING, categoriaColor, shadow } from '../theme';
+import {Image} from 'expo-image';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import { COLORS, RADIUS, SPACING, categoriaColor, categoriaDescripcion, shadow } from '../theme';
+
+const esGifValido=(url)=> !!url && /\.(gif|png|jpe?g|webp)(\?|$)/i.test(url);
 
 const EjercicioCard=({item, onCompletado})=>{
         const [tiempo,setTiempo]=useState(item.duracion_ejercicio);//Definimos el estado de tiempo de cada uno de los ejercicios,que después lo pasaremos a un intervalo de tiempo
         const [ejecutando,setEjecutando]=useState(false);
+        const [imagenFallida,setImagenFallida]=useState(!esGifValido(item.ejercicios.url_video));
         const [Fase,setFase]=useState('ejercicio');//Definimos el estado de la fase de cada uno de lños ejercicios,que después se utilizará para definir el tiempo de descanso y el tiempo de ejercicio,ya que cada uno de los ejercicios tiene un tiempo de ejercicio y un tiempo de descanso,por lo tanto,es importante definir la fase de cada uno de los ejercicios para poder mostrar el tiempo restante de cada uno de los ejercicios correctamente
 
         const ref=useRef(null);
@@ -69,16 +73,31 @@ const EjercicioCard=({item, onCompletado})=>{
          const color=categoriaColor(item.ejercicios.categoria);
          return(
                 <View style={styles.card}>
-      <Video
-         source={{ uri: item.ejercicios.url_video }}
-         style={styles.video}
-         useNativeControls
-         resizeMode="cover"
-      />
+      <View style={styles.imageWrapper}>
+        {imagenFallida ? (
+          <View style={styles.imagePlaceholder}>
+            <MaterialCommunityIcons name="boxing-glove" size={40} color={COLORS.textMuted}/>
+            <Text style={styles.imagePlaceholderText}>Gif no disponible todavía</Text>
+          </View>
+        ) : (
+          <Image
+             source={{ uri: item.ejercicios.url_video }}
+             style={styles.video}
+             contentFit="contain"
+             transition={200}
+             onError={()=>setImagenFallida(true)}
+          />
+        )}
+        <View style={[styles.categoryBadge,{ borderColor:color }]}>
+          <Text style={[styles.categoryBadgeText,{ color }]}>{item.ejercicios.categoria}</Text>
+        </View>
+      </View>
       <Text style={styles.nombre}>{item.ejercicios.nombre}</Text>
-      <Text style={[styles.info,{ borderColor:color, color }]}>{item.ejercicios.categoria}</Text>
+      <Text style={styles.meta}>{formatoTiempo(item.duracion_ejercicio)} ejercicio  ·  {item.duracion_descanso}s descanso</Text>
+      <Text style={styles.descripcion}>{categoriaDescripcion(item.ejercicios.categoria)}</Text>
          {Fase === 'ejercicio' && tiempo > 0 &&
          <Button title={ejecutando ? `Detener ${formatoTiempo(tiempo)}` : `Iniciar  ${formatoTiempo(item.duracion_ejercicio)}`} onPress={() => setEjecutando(!ejecutando)}
+          style={styles.startButton}
           />
          }
 
@@ -100,38 +119,82 @@ const EjercicioCard=({item, onCompletado})=>{
 const styles=StyleSheet.create({
         card:{
                 backgroundColor:COLORS.surface,
-                borderRadius:RADIUS.lg,
+                borderRadius:RADIUS.xl,
                 padding:SPACING.md,
                 marginBottom:SPACING.lg,
                 borderColor:COLORS.border,
                 borderWidth:1,
                 ...shadow('rgba(0,0,0,0.5)',0.5,10,5,{width:0,height:2}),
         },
-         video:{
+         imageWrapper:{
                 width:'100%',
-                height:220,
-                borderRadius:RADIUS.md,
+                aspectRatio:1,
+                borderRadius:RADIUS.xl,
                 marginBottom:SPACING.md,
-                backgroundColor:COLORS.black,
+                backgroundColor:COLORS.white,
+                borderWidth:1,
+                borderColor:COLORS.border,
+                overflow:'hidden',
+                position:'relative',
+                ...shadow(COLORS.primaryGlow,0.35,14,6,{width:0,height:4}),
         },
-        nombre:{
-                fontSize:18,
-                fontWeight:'700',
-                marginBottom:SPACING.sm,
-                letterSpacing:0.5,
-                 color:COLORS.textPrimary,
+        video:{
+                width:'100%',
+                height:'100%',
         },
-        info:{
+        imagePlaceholder:{
+                width:'100%',
+                height:'100%',
+                justifyContent:'center',
+                alignItems:'center',
+                gap:SPACING.sm,
+                backgroundColor:COLORS.surfaceAlt,
+        },
+        imagePlaceholderText:{
                 fontSize:12,
-                fontWeight:'700',
-                marginBottom:SPACING.md,
-                letterSpacing:1,
+                fontWeight:'600',
+                color:COLORS.textMuted,
+                letterSpacing:0.3,
+        },
+        categoryBadge:{
+                position:'absolute',
+                top:SPACING.sm,
+                left:SPACING.sm,
+                backgroundColor:'rgba(10,10,10,0.85)',
                 borderWidth:1,
                 paddingHorizontal:SPACING.sm,
                 paddingVertical:4,
-                borderRadius:RADIUS.sm,
-                alignSelf:'flex-start',
+                borderRadius:RADIUS.pill,
+        },
+        categoryBadgeText:{
+                fontSize:11,
+                fontWeight:'800',
+                letterSpacing:1,
                 textTransform:'uppercase',
+        },
+        nombre:{
+                fontSize:20,
+                fontWeight:'800',
+                marginBottom:4,
+                letterSpacing:0.3,
+                 color:COLORS.textPrimary,
+        },
+        meta:{
+                fontSize:13,
+                fontWeight:'600',
+                color:COLORS.textSecondary,
+                marginBottom:SPACING.sm,
+                letterSpacing:0.3,
+        },
+        descripcion:{
+                fontSize:13,
+                fontWeight:'400',
+                color:COLORS.textSecondary,
+                lineHeight:19,
+                marginBottom:SPACING.md,
+        },
+        startButton:{
+                borderRadius:RADIUS.pill,
         },
         message:{
                fontSize: 14,

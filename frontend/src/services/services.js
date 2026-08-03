@@ -67,9 +67,8 @@ export const loginUser=async(email,password)=>{
          const data=await response.json();
          //Lo pasamos a json para poder usarlo en el frontend
          if(!response.ok){
-            throw new Error(data.message || `Error al iniciar sesión ${error.message}`);
-            console.error('Error al iniciar sesión',error);
-         }        
+            throw new Error(data.message || 'Error al iniciar sesión');
+         }
          else{
             await AsyncStorage.setItem('token',data.token);
             alert('Inicio de sesión exitoso');

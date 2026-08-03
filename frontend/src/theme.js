@@ -81,3 +81,14 @@ export const categoriaColor = (categoria) => {
         default: return COLORS.textPrimary;
     }
 };
+
+export const categoriaDescripcion = (categoria) => {
+    switch (categoria) {
+        case 'Saco': return 'Trabaja potencia, técnica y resistencia golpeando el saco con combinaciones controladas.';
+        case 'Pera': return 'Mejora tu coordinación y velocidad de manos con la pera loca en movimiento constante.';
+        case 'Manoplas': return 'Ejercicio con compañero para perfeccionar reflejos, precisión y combinaciones de golpeo.';
+        case 'Cardio': return 'Rutina de alta intensidad para quemar calorías y mejorar tu resistencia cardiovascular.';
+        case 'Comba': return 'Salta a la comba para ganar agilidad de pies, ritmo y resistencia como un boxeador.';
+        default: return 'Ejercicio de entrenamiento de boxeo pensado para mejorar tu rendimiento en el ring.';
+    }
+};
