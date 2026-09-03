@@ -1,6 +1,6 @@
 //Vamos a crear la pantalla del login
 import React from 'react';
-import {View,Text,StyleSheet,ActivityIndicator,KeyboardAvoidingView} from 'react-native';
+import {View,Text,StyleSheet,ActivityIndicator,KeyboardAvoidingView,Image,Platform} from 'react-native';
 import {useState,useEffect} from 'react';
 import Button from '../components/Button';
 import TextInputComponent from '../components/TextInput';
@@ -73,22 +73,30 @@ const Login=()=>{
        else{
           return(
             
-           <KeyboardAvoidingView style={styles.Container} behavior="padding">
-            <View style={styles.TitleContainer}>
-                <Text style={styles.LogoStyle}>GoFight</Text>
-                
-            </View>
-        
-           
+           <KeyboardAvoidingView style={styles.Container} behavior={Platform.OS==='ios' ? 'padding' : undefined}>
+            <View style={styles.BackgroundGlow}/>
+            <View style={styles.Content}>
+                <View style={styles.TitleContainer}>
+                    <Image
+                        source={require('../../assets/GF Boxing Pulse Logo.png')}
+                        style={styles.LogoImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.Eyebrow}>ENTRENA. SUPÉRATE. REPITE.</Text>
+                    <Text style={styles.WelcomeTitle}>Bienvenido de nuevo</Text>
+                    <Text style={styles.WelcomeText}>Continúa construyendo tu mejor versión.</Text>
+                </View>
                 <View style={styles.LoginContainer}>
-                     <Text style={styles.TitleStyle}>Inciar Sesión</Text>
+                     <Text style={styles.TitleStyle}>Iniciar sesión</Text>
+                     <Text style={styles.FormSubtitle}>Accede para continuar con tu entrenamiento.</Text>
                     <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" iconName="mail-outline"/>
                     <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
                     <Button title="Iniciar Sesión" onPress={handleLogin}/>
                     <Button title="Continuar con Google" variant="secondary" disabled={!googleRequest || googleLoading} onPress={()=>promptGoogleAsync()}/>
-                    <Text style={styles.Mensajes}>¿No tienes una cuenta? <Text style={styles.MensajeStyle} onPress={()=>navigation.navigate('register')}>Regístrate</Text></Text>
+                    <Text style={styles.Mensajes}>¿Aún no tienes cuenta? <Text style={styles.MensajeStyle} onPress={()=>navigation.navigate('register')}>Crear cuenta</Text></Text>
                     {message ? <ErrorMsg message={message}/> : null}
                 </View>
+            </View>
            </KeyboardAvoidingView>
         )
        }
@@ -96,56 +104,81 @@ const Login=()=>{
 const styles=StyleSheet.create({
         Container:{
             flex:1,
-            justifyContent:'center',
-            alignItems:'center',
             backgroundColor:COLORS.background,
             width:'100%',
         },
+        Content:{
+            flex:1,
+            justifyContent:'center',
+            paddingHorizontal:SPACING.xl,
+            zIndex:1,
+        },
+        BackgroundGlow:{
+            position:'absolute',
+            width:330,
+            height:330,
+            borderRadius:165,
+            backgroundColor:'rgba(255,34,51,0.11)',
+            top:-145,
+            right:-95,
+        },
         TitleContainer:{
             alignItems:'center',
+            marginBottom:SPACING.xl,
         },
         LoginContainer:{
-            width:'85%',
-            backgroundColor:COLORS.surfaceAlt,
-            padding:24,
+            backgroundColor:COLORS.surface,
+            padding:SPACING.xl,
             borderRadius:RADIUS.xl,
-            borderColor:'rgba(255, 34, 51,0.25)',
+            borderColor:'rgba(255, 34, 51,0.32)',
             borderWidth:1,
             gap:SPACING.sm,
-            marginTop:SPACING.xl,
-            ...shadow(COLORS.primaryGlow,0.5,10,5,{width:0,height:4}),
+            ...shadow(COLORS.primaryGlow,0.28,18,8,{width:0,height:6}),
         },
-        LogoStyle:{
-            fontSize:26,
-            fontWeight:'800',
+        LogoImage:{
+            width:154,
+            height:88,
+            marginBottom:SPACING.sm,
+        },
+        Eyebrow:{
             color:COLORS.primary,
-            letterSpacing:2,
-            marginBottom:SPACING.xl,
-            textTransform:'uppercase',
-            textShadowColor:'rgba(255, 34, 51,0.5)',
-            textShadowOffset:{width:2,height:2},
-            textShadowRadius:10,
+            fontSize:10,
+            fontWeight:'800',
+            letterSpacing:1.8,
+            marginBottom:SPACING.sm,
+        },
+        WelcomeTitle:{
+            color:COLORS.textPrimary,
+            fontSize:27,
+            fontWeight:'800',
+            letterSpacing:-0.4,
+        },
+        WelcomeText:{
+            color:COLORS.textSecondary,
+            fontSize:14,
+            marginTop:SPACING.xs,
         },
         TitleStyle:{
-            fontSize:18,
+            fontSize:21,
             fontWeight:'800',
-            color:COLORS.primary,
-            letterSpacing:2,
-            marginBottom:SPACING.lg,
-            textTransform:'uppercase',
-            textShadowColor:'rgba(255, 34, 51,0.5)',
-            textShadowOffset:{width:2,height:2},
-            textShadowRadius:10,
-            textAlign:'center',
+            color:COLORS.textPrimary,
+            marginBottom:SPACING.xs,
+        },
+        FormSubtitle:{
+            color:COLORS.textSecondary,
+            fontSize:13,
+            lineHeight:19,
+            marginBottom:SPACING.md,
         },
         Mensajes:{
             color:COLORS.textSecondary,
-            marginTop:SPACING.sm,
+            marginTop:SPACING.md,
             textAlign:'center',
+            fontSize:13,
         },
         MensajeStyle:{
-            color:COLORS.info,
-            textDecorationLine:'underline',
+            color:COLORS.primary,
+            fontWeight:'800',
         }
 
 })

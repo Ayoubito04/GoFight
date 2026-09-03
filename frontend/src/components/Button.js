@@ -1,9 +1,26 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 
 //Definimos como van a ser todos los botones de la aplicación,con soporte de variante (primary/secondary/ghost) y estado deshabilitado
-const Button = ({ title, onPress, variant = 'primary', disabled = false, style }) => {
+const Button = ({ title, onPress, variant = 'primary', disabled = false, style, showArrow = variant === 'primary' }) => {
+    const content = (
+        <View style={styles.content}>
+            <Text
+                style={[
+                    styles.text,
+                    variant === 'secondary' && styles.textSecondary,
+                    variant === 'ghost' && styles.textGhost,
+                ]}
+            >
+                {title}
+            </Text>
+            {showArrow && <Ionicons name="paper-plane-outline" size={17} color={variant === 'primary' ? COLORS.onPrimary : COLORS.primary}/>} 
+        </View>
+    );
+
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -17,40 +34,40 @@ const Button = ({ title, onPress, variant = 'primary', disabled = false, style }
                 style,
             ]}
         >
-            <Text
-                style={[
-                    styles.text,
-                    variant === 'secondary' && styles.textSecondary,
-                    variant === 'ghost' && styles.textGhost,
-                ]}
-            >
-                {title}
-            </Text>
+            {variant === 'primary' ? (
+                <LinearGradient colors={[COLORS.backgroundAlt, COLORS.primaryDark, COLORS.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryGradient}>
+                    {content}
+                </LinearGradient>
+            ) : content}
         </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
     base: {
-        backgroundColor: COLORS.primary,
-        paddingVertical: SPACING.md,
-        paddingHorizontal: SPACING.lg,
-        borderRadius: RADIUS.md,
-        alignItems: 'center',
+        minHeight: 50,
+        borderRadius: RADIUS.pill,
+        borderWidth: 1,
+        borderColor: 'rgba(255,71,87,0.72)',
+        overflow: 'hidden',
+        ...shadow(COLORS.primaryGlow, 0.52, 16, 8, { width: 0, height: 5 }),
+    },
+    primaryGradient: {
+        minHeight: 48,
         justifyContent: 'center',
-        ...shadow(COLORS.primaryGlow, 0.5, 10, 5, { width: 0, height: 2 }),
+        paddingHorizontal: SPACING.xl,
     },
     secondary: {
         backgroundColor: COLORS.surfaceElevated,
-        borderWidth: 1,
-        borderColor: COLORS.borderStrong,
+        borderColor: 'rgba(255,34,51,0.42)',
+        paddingHorizontal: SPACING.xl,
         shadowOpacity: 0,
         elevation: 0,
     },
     ghost: {
         backgroundColor: 'transparent',
-        borderWidth: 1,
         borderColor: COLORS.primary,
+        paddingHorizontal: SPACING.xl,
         shadowOpacity: 0,
         elevation: 0,
     },
@@ -59,11 +76,17 @@ const styles = StyleSheet.create({
     },
     text: {
         color: COLORS.onPrimary,
-        textAlign: 'center',
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '800',
-        letterSpacing: 0.5,
+        letterSpacing: 0.8,
         textTransform: 'uppercase',
+    },
+    content: {
+        minHeight: 48,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: SPACING.sm,
     },
     textSecondary: {
         color: COLORS.textPrimary,

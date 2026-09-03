@@ -52,45 +52,30 @@ const StackContainer=()=>{
          else{
                return(
                      <View style={style.Container}>
-                            <View style={style.StackConatiner}>
-                                <View>
-                                    <Text style={style.Subtitle}>Racha:</Text>
-                                        <Text style={style.Text}>  {`${gamificaciones?.gamificaciones?.racha_dias} dias`}</Text>
-                                </View>
-                                <View>
-                                    <Ionicons name="flame" size={26} color="#ff4500" style={style.Icon}/>
-                                </View>
+                            <View style={[style.StackConatiner,style.FeaturedCard]}>
+                                <View style={[style.IconBubble,style.FlameBubble]}><Ionicons name="flame" size={23} color={COLORS.primary}/></View>
+                                <Text style={style.Subtitle}>Racha actual</Text>
+                                <Text style={style.Text}>{`${gamificaciones?.gamificaciones?.racha_dias || 0} días`}</Text>
+                                <Text style={style.CardHint}>Sigue sumando rounds</Text>
                             </View>
                             <View style={style.StackConatiner}>
-                                <View>
-                                        <Text style={style.Subtitle}>Puntos:</Text>
-                                        <Text style={style.Text}>  {`${gamificaciones?.gamificaciones?.puntos_ranking} puntos`}</Text>
-                                </View>
-                                <View>
-                                        <FontAwesome name="star" size={26} color="#fee500" style={style.Icon}/>
-                                </View>
-                                <Button title="ver ranking" variant="secondary" onPress={() => navigation.navigate('Ranking')}/>
+                                <View style={[style.IconBubble,style.RankingBubble]}><FontAwesome name="star" size={20} color={COLORS.gold}/></View>
+                                <Text style={style.Subtitle}>Puntos ranking</Text>
+                                <Text style={style.Text}>{`${gamificaciones?.gamificaciones?.puntos_ranking || 0}`}</Text>
+                                <Button title="Ver ranking" variant="secondary" onPress={() => navigation.navigate('Ranking')} style={style.CardButton}/>
                             </View>
-                              <View style={style.StackConatiner}>
-                                <View>
-                                        <Text style={style.Subtitle}>Sesiones:</Text>
-                                        <Text style={style.Text}>  {`${sesionesHistorial.length || 0} completas`}</Text>
-                                </View>
-                                <View>
-                                        <FontAwesome name="calendar" size={26} color="#0efd3a" style={style.Icon}/>
-                                </View>
+                            <View style={style.StackConatiner}>
+                                <View style={[style.IconBubble,style.SessionBubble]}><Ionicons name="checkmark-done" size={22} color={COLORS.success}/></View>
+                                <Text style={style.Subtitle}>Sesiones</Text>
+                                <Text style={style.Text}>{`${sesionesHistorial.length || 0}`}</Text>
+                                <Text style={style.CardHint}>Completadas</Text>
                             </View>
-                              <View style={style.StackConatiner}>
-                                <View>
-                                        <Text style={style.Subtitle}>Mis rutinas:</Text>
-                                        <Text style={style.Text}>  {`${rutinas?.length || 0}`}</Text>
-                                </View>
-                                <View>
-                                        <FontAwesome name="list" size={26} color="#ffffff" style={style.Icon}/>
-                                </View>
-                                <Button title="ver rutinas" variant="secondary" onPress={() => navigation.navigate('MisRutinas')}/>
+                            <View style={style.StackConatiner}>
+                                <View style={[style.IconBubble,style.RoutineBubble]}><Ionicons name="barbell" size={21} color={COLORS.info}/></View>
+                                <Text style={style.Subtitle}>Mis rutinas</Text>
+                                <Text style={style.Text}>{`${rutinas?.length || 0}`}</Text>
+                                <Button title="Ver rutinas" variant="secondary" onPress={() => navigation.navigate('MisRutinas')} style={style.CardButton}/>
                             </View>
-
                      </View>
                )
          }
@@ -98,7 +83,7 @@ const StackContainer=()=>{
 const style=StyleSheet.create({
     LoadingContainer:{
          flex:1,
-         justifyContent:'center',
+         justifyContent:'space-between',
          alignItems:'center',
          paddingVertical:SPACING.xxl,
     },
@@ -120,36 +105,59 @@ const style=StyleSheet.create({
             flexDirection:'column',
             justifyContent:'space-around',
             alignItems:'center',
-             backgroundColor:COLORS.surfaceElevated,
+             backgroundColor:COLORS.surface,
              padding:SPACING.lg,
-                height:170,
+                minHeight:184,
                 borderRadius:RADIUS.lg,
-                width:158,
+                width:'47%',
                 borderColor:COLORS.border,
                 borderWidth:1,
-                ...shadow('#000',0.5,15,8,{width:0,height:10}),
+                ...shadow('#000',0.35,14,6,{width:0,height:6}),
+    },
+    FeaturedCard:{
+         borderColor:'rgba(255,34,51,0.4)',
     },
     Text:{
          color:COLORS.textPrimary,
-         fontSize:16,
-            fontWeight:'700',
+         fontSize:25,
+            fontWeight:'900',
             textAlign:'center',
             fontFamily:'Helvetica',
            textTransform:'uppercase',
-           letterSpacing:1,
+           letterSpacing:-0.4,
 
     },
-    Icon:{
-         marginBottom:SPACING.sm,
+    IconBubble:{
+         width:42,
+         height:42,
+         borderRadius:21,
+         alignItems:'center',
+         justifyContent:'center',
+         marginBottom:SPACING.md,
     },
+    FlameBubble:{backgroundColor:'rgba(255,34,51,0.14)'},
+    RankingBubble:{backgroundColor:'rgba(236,193,18,0.12)'},
+    SessionBubble:{backgroundColor:'rgba(46,213,115,0.12)'},
+    RoutineBubble:{backgroundColor:'rgba(58,169,255,0.12)'},
     Subtitle:{
          fontFamily:'Helvetica',
          color:COLORS.textSecondary,
-         fontSize:10,
-         textAlign:'center',
+        fontSize:10,
+        textAlign:'left',
         textTransform:'uppercase',
         letterSpacing:1.5,
         marginBottom:SPACING.xs,
+    },
+    CardHint:{
+         color:COLORS.textSecondary,
+         fontSize:12,
+    },
+    CardButton:{
+         minHeight:34,
+         paddingVertical:SPACING.sm,
+         paddingHorizontal:SPACING.md,
+         alignSelf:'flex-start',
+         marginTop:SPACING.xs,
     },
 
 })
