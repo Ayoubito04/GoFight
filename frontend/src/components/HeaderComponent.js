@@ -1,6 +1,6 @@
 //Vamos a definir el header de la aplicación,que va a ser un componente esencial para casí todas las paginas
 import React from 'react';
-import {View,Text,StyleSheet,SafeAreaView, Platform, StatusBar, TouchableOpacity, Alert} from 'react-native';
+import {View,Text,StyleSheet,SafeAreaView, Platform, StatusBar, TouchableOpacity, Alert, Image} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import { getUserProfile } from '../services/services';
 import { useEffect, useState } from 'react';
@@ -38,7 +38,14 @@ const Header=()=>{
                         </TouchableOpacity>
 
                         <View style={style.GreetingContainer}>
-                              <Text style={style.Greeting} numberOfLines={1}>Hola, {nombre || 'Invitado'} 👋</Text>
+                              <View style={style.GreetingRow}>
+                                    <Image
+                                          source={require('../../assets/GF Boxing Pulse Logo.png')}
+                                          style={style.HeaderLogo}
+                                          resizeMode="contain"
+                                    />
+                                    <Text style={style.Greeting} numberOfLines={1}>Hola, {nombre || 'Invitado'} 👋</Text>
+                              </View>
                               <Text style={style.Subtitle}>Listo para superar tus objetivos hoy</Text>
                         </View>
 
@@ -86,6 +93,15 @@ const style=StyleSheet.create({
       GreetingContainer:{
             flex:1,
             paddingHorizontal:SPACING.md,
+      },
+      GreetingRow:{
+            flexDirection:'row',
+            alignItems:'center',
+            gap:SPACING.sm,
+      },
+      HeaderLogo:{
+            width:34,
+            height:34,
       },
       Greeting:{
             fontSize:16,

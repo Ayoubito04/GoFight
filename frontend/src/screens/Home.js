@@ -1,11 +1,10 @@
 //Aquí vamos a implementar la pantalla de incio
 //Vamos a implementar cada uno de los componentes que vamos a utilizar en la pantalla de inicio
-import React, { act } from 'react';
+import React from 'react';
 import {View,Text,StyleSheet,ActivityIndicator, ScrollView} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {useState,useEffect} from 'react';
 import Button from '../components/Button';
-import TextInputComponent from '../components/TextInput';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/Footer';
 import { getGamificaciones,ActualizarGamificaciones } from '../services/services';//Obtenemos las gamificaciones y lo probamos en la pantalla de inicio,para ver si se actualizan cada vez que se registre una sesión en el historial,ya que cada vez que se registre una sesión en el historial,tenemos que actualizar las gamificaciones,por lo tanto,es importante probarlo en la pantalla de inicio,para ver si se actualizan correctamente
@@ -17,7 +16,7 @@ import { getUserProfile } from '../services/services';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useRef } from 'react';
-import { COLORS, SPACING } from '../theme';
+import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 //Para eso importamos el servicio para obtener usuarios,ya que necsitamos obtener el rol del usuario,que nos tendría que dar acceso a ese panel
 
 
@@ -82,8 +81,19 @@ const Home=()=>{
      else{
           return(
                <SafeAreaView style={style.Container}>
-                     <Header/>
+                      <Header/>
                       <ScrollView contentContainerStyle={style.ScrollContent}>
+                          <View style={style.HeroCard}>
+                              <View style={style.HeroAccent}/>
+                              <Text style={style.HeroEyebrow}>ENTRENAMIENTO DE HOY</Text>
+                              <Text style={style.HeroTitle}>Prepárate para{`\n`}el siguiente round.</Text>
+                              <Text style={style.HeroText}>El progreso se gana un asalto a la vez.</Text>
+                              <Button title="Explorar rutinas" onPress={()=>navigation.navigate('Rutinas')} style={style.HeroButton}/>
+                          </View>
+                          <View style={style.SectionHeader}>
+                              <Text style={style.SectionTitle}>Tu progreso</Text>
+                              <Text style={style.SectionCaption}>ESTA SEMANA</Text>
+                          </View>
                           <StackContainer datos={gamificaciones}/>
                               <BarraProgreso actual={caloriasQuemadas} objetivo={300} unidad="kcal"
 
@@ -116,7 +126,70 @@ const style=StyleSheet.create({
           backgroundColor:COLORS.background,
      },
      ScrollContent:{
-          paddingBottom:SPACING.xl,
+          paddingBottom:SPACING.xxl,
+     },
+     HeroCard:{
+          marginHorizontal:SPACING.lg,
+          marginTop:SPACING.md,
+          padding:SPACING.xl,
+          borderRadius:RADIUS.xl,
+          overflow:'hidden',
+          backgroundColor:COLORS.surfaceElevated,
+          borderWidth:1,
+          borderColor:'rgba(255,34,51,0.34)',
+          ...shadow(COLORS.primaryGlow,0.3,18,8,{width:0,height:6}),
+     },
+     HeroAccent:{
+          position:'absolute',
+          width:180,
+          height:180,
+          borderRadius:90,
+          backgroundColor:'rgba(255,34,51,0.14)',
+          right:-68,
+          top:-74,
+     },
+     HeroEyebrow:{
+          color:COLORS.primary,
+          fontSize:10,
+          letterSpacing:1.6,
+          fontWeight:'800',
+          marginBottom:SPACING.sm,
+     },
+     HeroTitle:{
+          color:COLORS.textPrimary,
+          fontSize:27,
+          lineHeight:32,
+          fontWeight:'900',
+          letterSpacing:-0.5,
+     },
+     HeroText:{
+          color:COLORS.textSecondary,
+          marginTop:SPACING.sm,
+          marginBottom:SPACING.lg,
+          fontSize:14,
+     },
+     HeroButton:{
+          alignSelf:'flex-start',
+          minWidth:190,
+     },
+     SectionHeader:{
+          flexDirection:'row',
+          alignItems:'center',
+          justifyContent:'space-between',
+          paddingHorizontal:SPACING.lg,
+          marginTop:SPACING.xxl,
+          marginBottom:SPACING.xs,
+     },
+     SectionTitle:{
+          color:COLORS.textPrimary,
+          fontSize:20,
+          fontWeight:'800',
+     },
+     SectionCaption:{
+          color:COLORS.textMuted,
+          fontSize:10,
+          letterSpacing:1.4,
+          fontWeight:'800',
      },
      AdminButtonContainer:{
           marginTop:SPACING.xl,

@@ -3,6 +3,7 @@
     "name": "frontend",
     "slug": "frontend",
     "version": "1.0.0",
+    "scheme": "gofight",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,6 +16,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.gofight.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -24,6 +26,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   }
 }

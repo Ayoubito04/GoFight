@@ -1,5 +1,5 @@
-import react from 'react';
-import {View,Text,TouchableOpacity,StyleSheet,ActivityIndicator,KeyboardAvoidingView} from 'react-native';
+import React from 'react';
+import {View,Text,TouchableOpacity,StyleSheet,ActivityIndicator,KeyboardAvoidingView,Image,Platform,ScrollView} from 'react-native';
 
 import {useState,useEffect} from 'react';
 import {registerUser} from '../services/services';
@@ -54,10 +54,11 @@ export default function Register({}){
           const handleClick=async()=>{
               if(!nombre  || !email || !password || !confirmPassword){
                    setMessage('Por favor,complete todos los campos');
-                   
+                   return;
               }
               else if(password!==confirmPassword){
                    setMessage('Las contraseñas no coinciden');
+                   return;
               }
                try{
                  
@@ -81,31 +82,40 @@ export default function Register({}){
         
 
             return(
-                <View style={styles.Container}>
+                <KeyboardAvoidingView style={styles.Container} behavior={Platform.OS==='ios' ? 'padding' : undefined}>
+                    <View style={styles.BackgroundGlow}/>
+                    <ScrollView contentContainerStyle={styles.ScrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                     <View style={styles.FlexView}>
-                        <Text style={styles.TitleStyle}>GoFight</Text>
-                        
-
+                        <Image
+                            source={require('../../assets/GF Boxing Pulse Logo.png')}
+                            style={styles.LogoImage}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.Eyebrow}>TU PRÓXIMO ROUND EMPIEZA AQUÍ</Text>
+                        <Text style={styles.WelcomeTitle}>Únete a GoFight</Text>
+                        <Text style={styles.WelcomeText}>Crea tu cuenta y empieza a entrenar a tu ritmo.</Text>
                     </View>
                     
                        
 
-                    <KeyboardAvoidingView style={styles.FormStyle}>
+                    <View style={styles.FormStyle}>
                       <Text style={styles.RegistrarseText}>Registrarse</Text>
+                      <Text style={styles.FormSubtitle}>Completa tus datos para crear tu perfil.</Text>
                         <TextInputComponent placeholder="Nombre" value={nombre} onChangeText={setNombre} iconName="person-outline"/>
                         <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" iconName="mail-outline"/>
                         <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
                         <TextInputComponent placeholder="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry iconName="lock-closed-outline"/>
                         <Button title="Registrar" onPress={handleClick}/>
                         <TouchableOpacity onPress={handleToLogin}>
-                            <Text style={styles.LinkStyle}>¿Ya tienes una cuenta?<Text style={styles.IniciarSesionText}>Iniciar Sesión</Text></Text>
+                            <Text style={styles.LinkStyle}>¿Ya tienes una cuenta? <Text style={styles.IniciarSesionText}>Iniciar sesión</Text></Text>
                         </TouchableOpacity>
                        <View>
                         {message ? <ErrorMsg message={message}/> : null}
                         </View>
 
-                    </KeyboardAvoidingView>
-                </View>
+                    </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
             )
 }
 
@@ -114,10 +124,22 @@ const styles=StyleSheet.create({
     //Vamos a definir los estilos para la pantalla de registro
       Container:{
         flex:1,
-        justifyContent:'center',
-        alignItems:'center',
-        padding:SPACING.xl,
         backgroundColor:COLORS.background,
+      },
+      ScrollContent:{
+        flexGrow:1,
+        justifyContent:'center',
+        padding:SPACING.xl,
+        zIndex:1,
+      },
+      BackgroundGlow:{
+        position:'absolute',
+        width:330,
+        height:330,
+        borderRadius:165,
+        backgroundColor:'rgba(255,34,51,0.11)',
+        top:-145,
+        left:-95,
       },
       LoadingContainer:{
          flex:1,
@@ -126,41 +148,55 @@ const styles=StyleSheet.create({
          backgroundColor:COLORS.background,
       },
       FlexView:{
-        flexDirection:'row',
         alignItems:'center',
         justifyContent:'center',
+        marginBottom:SPACING.xl,
       },
       RegistrarseText:{
-        fontSize:20,
-        fontWeight:'700',
-        marginBottom:SPACING.xl,
-        color:COLORS.primary,
-        paddingTop:SPACING.xl,
-        textAlign:'center',
-        textShadowColor:'rgba(255, 34, 51,0.5)',
-        },
-      TitleStyle:{
-        fontSize:26,
+        fontSize:21,
         fontWeight:'800',
+        marginBottom:SPACING.xs,
+        color:COLORS.textPrimary,
+        },
+      LogoImage:{
+        width:154,
+        height:88,
+        marginBottom:SPACING.sm,
+      },
+      Eyebrow:{
         color:COLORS.primary,
-        marginBottom:SPACING.xl,
-        marginTop:SPACING.xl,
+        fontSize:10,
+        fontWeight:'800',
+        letterSpacing:1.45,
+        marginBottom:SPACING.sm,
         textAlign:'center',
-          textShadowColor:COLORS.primary,
-          textShadowOffset:{width:1,height:1},
-          textShadowRadius:6,
-          textTransform:'uppercase',
-          letterSpacing:3,
+      },
+      WelcomeTitle:{
+        color:COLORS.textPrimary,
+        fontSize:27,
+        fontWeight:'800',
+        letterSpacing:-0.4,
+      },
+      WelcomeText:{
+        color:COLORS.textSecondary,
+        fontSize:14,
+        marginTop:SPACING.xs,
+        textAlign:'center',
       },
       FormStyle:{
         width:'100%',
-        marginBottom:SPACING.xl,
-        padding:24,
+        padding:SPACING.xl,
         borderRadius:RADIUS.xl,
-        backgroundColor:COLORS.surfaceAlt,
-        borderColor:'rgba(255, 34, 51,0.25)',
+        backgroundColor:COLORS.surface,
+        borderColor:'rgba(255, 34, 51,0.32)',
         borderWidth:1,
-        ...shadow(COLORS.primary,0.5,10,5,{width:0,height:4}),
+        ...shadow(COLORS.primaryGlow,0.28,18,8,{width:0,height:6}),
+      },
+      FormSubtitle:{
+        color:COLORS.textSecondary,
+        fontSize:13,
+        lineHeight:19,
+        marginBottom:SPACING.md,
       },
       Mensajes:{
         color:COLORS.danger,
@@ -177,13 +213,12 @@ const styles=StyleSheet.create({
         alignItems:'center',
         justifyContent:'center',
         textAlign:'center',
-        marginTop:SPACING.xl,
+        marginTop:SPACING.lg,
 
       },
       IniciarSesionText:{
-        color:COLORS.info,
-        fontWeight:'bold',
-        textDecorationLine:'underline',
+        color:COLORS.primary,
+        fontWeight:'800',
 
       }
 
