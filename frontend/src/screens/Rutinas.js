@@ -3,7 +3,7 @@ import React,{useState,useEffect} from 'react';
 import {View,Text,StyleSheet,ActivityIndicator,SafeAreaView,Platform,StatusBar,FlatList,TextInput,TouchableOpacity} from 'react-native';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/Footer';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { getRutinasDisponibles } from '../services/services';
 import Button from '../components/Button';
 import TextInputComponent from '../components/TextInput';

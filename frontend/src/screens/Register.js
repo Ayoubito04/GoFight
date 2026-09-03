@@ -2,7 +2,7 @@ import react from 'react';
 import {View,Text,TouchableOpacity,StyleSheet,ActivityIndicator,KeyboardAvoidingView} from 'react-native';
 
 import {useState,useEffect} from 'react';
-import {registerUser} from '../services/services';
+import {registerUser,googleAuth} from '../services/services';
 import Button from '../components/Button';
 import TextInputComponent from '../components/TextInput';
 import {useNavigation} from '@react-navigation/native';
@@ -10,6 +10,7 @@ import {Ionicons} from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ErrorMsg from '../components/ErrorMsg';
 import { COLORS, RADIUS, SPACING, shadow } from '../theme';
+import useGoogleAuth from '../hooks/useGoogleAuth';
 
 
 
@@ -24,6 +25,26 @@ export default function Register({}){
             const [confirmPassword,setConfirmPassword]=useState('');
             const [message,setMessage]=useState('');
             const [laoding,setLoading]=useState(false);
+            const [googleLoading,setGoogleLoading]=useState(false);
+            const navigation=useNavigation();
+            const handleGoogleIdToken=async(idToken,error)=>{
+                if(error || !idToken){
+                     setMessage('No se ha podido registrar con Google');
+                     return;
+                }
+                try{
+                     setGoogleLoading(true);
+                     await googleAuth(idToken);
+                     setMessage('');
+                     alert('Registro con Google exitoso');
+                     navigation.navigate('home');
+                }catch(error){
+                     setMessage(`Error al registrar con Google: ${error.message}`);
+                }finally{
+                     setGoogleLoading(false);
+                }
+            }
+            const {request:googleRequest,promptAsync:promptGoogleAsync}=useGoogleAuth(handleGoogleIdToken);
 
             //Tenemos los hooks necesarios para manejar el esatdo de los campos formularios
            //Antes de empezar con la lógica de los hooks,vamos a poner una pantalla de carga
@@ -46,8 +67,7 @@ export default function Register({}){
 
 
          }
-         const navigation=useNavigation();
-          //Vamos a implemenatar la lógica para navegar a la pantalla de login
+         //Vamos a implemenatar la lógica para navegar a la pantalla de login
           const handleToLogin=()=>{
                 navigation.navigate('login');
           }
@@ -97,6 +117,7 @@ export default function Register({}){
                         <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
                         <TextInputComponent placeholder="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry iconName="lock-closed-outline"/>
                         <Button title="Registrar" onPress={handleClick}/>
+                        <Button title="Continuar con Google" variant="secondary" disabled={!googleRequest || googleLoading} onPress={()=>promptGoogleAsync()}/>
                         <TouchableOpacity onPress={handleToLogin}>
                             <Text style={styles.LinkStyle}>¿Ya tienes una cuenta?<Text style={styles.IniciarSesionText}>Iniciar Sesión</Text></Text>
                         </TouchableOpacity>

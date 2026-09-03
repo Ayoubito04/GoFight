@@ -59,7 +59,8 @@ model usuarios {
   id_usuario         Int                  @id @default(autoincrement())
   nombre             String               @db.VarChar(150)
   email              String               @unique @db.VarChar(200)
-  contrasena         String               @db.VarChar(255)
+  contrasena         String?              @db.VarChar(255)
+  google_id          String?              @unique @db.VarChar(255)
   rol                Role                 @default(user)
   perfil             String?
   gamificaciones     gamificaciones[]

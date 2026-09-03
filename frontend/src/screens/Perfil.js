@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
-import { getUserProfile, getGamificaciones,actualizarPerfil} from '../services/services';
+import { getUserProfile, getGamificaciones,actualizarPerfil,vincularGoogle,desvincularGoogle} from '../services/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../components/Footer';
 import { Image } from 'react-native';
@@ -17,6 +17,7 @@ import Button from '../components/Button';
 import { Modal } from 'react-native';
 import TextInput from '../components/TextInput';
 import { COLORS } from '../theme';
+import useGoogleAuth from '../hooks/useGoogleAuth';
 const Perfil = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [perfil, setPerfil] = useState(null);
@@ -25,24 +26,57 @@ const Perfil = ({ navigation }) => {
     const [newNombre, setNewNombre] = useState('');//Vamos a actualizar el nombre del usuario,en caso de que quiera cambiarlo
     const [newEmail, setNewEmail] = useState('');//Vamos a actualizar el email del usuario,en caso de que quiera cambiarlo
     const [gamificaciones, setGamificaciones] = useState(null);
+    const [googleActionLoading, setGoogleActionLoading] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            const [profileData, gamData] = await Promise.all([
+                getUserProfile(),
+                getGamificaciones(),
+            ]);
+            setPerfil(profileData);
+            setGamificaciones(gamData);
+        } catch (error) {
+            console.error('Error al obtener los datos del perfil:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [profileData, gamData] = await Promise.all([
-                    getUserProfile(),
-                    getGamificaciones(),
-                ]);
-                setPerfil(profileData);
-                setGamificaciones(gamData);
-            } catch (error) {
-                console.error('Error al obtener los datos del perfil:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, []);
+
+    const handleGoogleIdToken = async (idToken, error) => {
+        if (error || !idToken) {
+            alert('No se ha podido vincular la cuenta de Google');
+            return;
+        }
+        try {
+            setGoogleActionLoading(true);
+            await vincularGoogle(idToken);
+            alert('Cuenta de Google vinculada exitosamente');
+            await fetchData();
+        } catch (error) {
+            alert(`Error al vincular la cuenta de Google: ${error.message}`);
+        } finally {
+            setGoogleActionLoading(false);
+        }
+    };
+    const { request: googleRequest, promptAsync: promptGoogleAsync } = useGoogleAuth(handleGoogleIdToken);
+
+    const handleUnlinkGoogle = async () => {
+        try {
+            setGoogleActionLoading(true);
+            await desvincularGoogle();
+            alert('Cuenta de Google desvinculada exitosamente');
+            await fetchData();
+        } catch (error) {
+            alert(`Error al desvincular la cuenta de Google: ${error.message}`);
+        } finally {
+            setGoogleActionLoading(false);
+        }
+    };
 
     const handleLogout = async () => {
         await AsyncStorage.removeItem('token');
@@ -90,6 +124,7 @@ const Perfil = ({ navigation }) => {
     const tipoPerfil = perfil?.perfilUsuario?.perfil || '—';
     const racha = gamificaciones?.gamificaciones?.racha_dias ?? 0;
     const puntos = gamificaciones?.gamificaciones?.puntos_ranking ?? 0;
+    const googleVinculado = !!perfil?.perfilUsuario?.google_id;
 
     return (
         <SafeAreaView style={styles.Container}>
@@ -166,6 +201,33 @@ const Perfil = ({ navigation }) => {
                           <Button title="Actualizar perfil" onPress={() => setModalVisible(true)} />
                            
                         </View>
+                </View>
+
+                {/* Cuenta de Google */}
+                <View style={styles.Section}>
+                    <Text style={styles.SectionTitle}>Cuenta de Google</Text>
+                    <View style={styles.InfoRow}>
+                        <Ionicons name="logo-google" size={20} color={COLORS.primary} />
+                        <Text style={styles.InfoLabel}>Estado</Text>
+                        <Text style={styles.InfoValue}>{googleVinculado ? 'Vinculada' : 'No vinculada'}</Text>
+                    </View>
+                    <View>
+                        {googleVinculado ? (
+                            <Button
+                                title="Desvincular de Google"
+                                variant="secondary"
+                                disabled={googleActionLoading}
+                                onPress={handleUnlinkGoogle}
+                            />
+                        ) : (
+                            <Button
+                                title="Vincular con Google"
+                                variant="secondary"
+                                disabled={!googleRequest || googleActionLoading}
+                                onPress={() => promptGoogleAsync()}
+                            />
+                        )}
+                    </View>
                 </View>
 
                 {/* Stats */}

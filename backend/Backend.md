@@ -51,3 +51,22 @@ En rutinas almacenamos el id de la rutina,id del usuario,nombre de la rutina,los
 3.Deberías tener la API key de Cloudinary para insertar fotos de cualquier formato y videos
 4.Prisma es como el cerebro de la operación,para generar el cliente y para el ORM
 5.jsonwebtoken para poder generar tokens a la hora de logearte y permitir una autenticación de usuario
+
+# 7.Inicio de sesión / registro / vinculación con Google
+
+Desde esta rama se añade la posibilidad de que un usuario se registre,inicie sesión o vincule su cuenta ya existente con Google. El backend no habla directamente con Google Sign-In,sino que recibe el "idToken" que genera el propio dispositivo (con expo-auth-session en el frontend) y lo verifica contra los servidores de Google con la librería `google-auth-library`.
+
+Para que esto funcione,añade estas dos variables a tu `.env` (los Client ID se crean en Google Cloud Console > Credenciales > ID de cliente de OAuth 2.0,uno de tipo "Web" y otro de tipo "Android"):
+
+```
+GOOGLE_WEB_CLIENT_ID="TU_CLIENT_ID_WEB.apps.googleusercontent.com"
+GOOGLE_ANDROID_CLIENT_ID="TU_CLIENT_ID_ANDROID.apps.googleusercontent.com"
+```
+
+Rutas nuevas (todas bajo `/api/auth`):
+- `POST /google`: registra o inicia sesión con Google en una sola petición (recibe `{ idToken }`). Si ya existe una cuenta con ese email,se vincula automáticamente.
+- `POST /vincular_google` (requiere estar logeado): vincula la cuenta ya iniciada con una cuenta de Google (recibe `{ idToken }`).
+- `DELETE /desvincular_google` (requiere estar logeado): desvincula la cuenta de Google,solo si el usuario tiene una contraseña establecida.
+
+IMPORTANTE: si ya tenías la base de datos migrada,tienes que aplicar la nueva migración `20260903120000_add_google_auth` (por ejemplo con `npx prisma migrate dev`),ya que añade la columna `google_id` y hace que `contrasena` pueda ser nula (para las cuentas registradas solo con Google).
+

@@ -14,9 +14,7 @@ const ActualizarUsuario=async(req,res)=>{
         else if(!email){
             return res.status(400).json({message:'El email es obligatorio'});
         }
-        else if(!password){
-            return res.status(400).json({message:'La contraseña es obligatoria'});
-        }
+        //La contraseña es opcional,ya que los usuarios que se registraron con Google no tienen una contraseña establecida,y si no se envía una nueva,se mantiene la actual
         const UsuarioExistente=await prisma.usuarios.findUnique({
             where:{id_usuario:id}
 
@@ -133,7 +131,7 @@ const VerPerfilUsuario=async(req,res)=>{
     try{
             const perfilUsuario=await prisma.usuarios.findUnique({
                 where:{id_usuario:id_usuario},
-                select:{id_usuario:true,nombre:true,email:true,rol:true,perfil:true}
+                select:{id_usuario:true,nombre:true,email:true,rol:true,perfil:true,google_id:true}
              })
                 if(!perfilUsuario){
                     return res.status(404).json({message:'Usuario no encontrado,compruebe que exista'});

@@ -112,6 +112,67 @@ export const getUserProfile=async()=>{
          console.error('Error al obtener el perfil del usuario',error);
      }
 }
+//Con esta función el usuario se registra o inicia sesión con Google,todo en una sola petición,mandando el idToken que genera Google en el dispositivo
+export const googleAuth=async(idToken)=>{
+    try{
+        const response=await fetch(`${BASE_URL}/auth/google`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({idToken})
+        });
+        const data=await response.json();
+        if(!response.ok){
+            throw new Error(data.message || 'Error al iniciar sesión con Google');
+        }
+        await AsyncStorage.setItem('token',data.token);
+        //Guardamos el token igual que en el login normal,para que el resto de la app funcione exactamente igual
+        return data;
+    }catch(error){
+        throw error;
+    }
+}
+//Con esta función el usuario que ya tiene la sesión iniciada puede vincular su cuenta a Google
+export const vincularGoogle=async(idToken)=>{
+    try{
+        const token=await AsyncStorage.getItem('token');
+        const response=await fetch(`${BASE_URL}/auth/vincular_google`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization':`Bearer ${token}`
+            },
+            body:JSON.stringify({idToken})
+        });
+        const data=await response.json();
+        if(!response.ok){
+            throw new Error(data.message || 'Error al vincular la cuenta de Google');
+        }
+        return data;
+    }catch(error){
+        throw error;
+    }
+}
+//Con esta función el usuario desvincula su cuenta de Google,siempre que tenga una contraseña con la que poder seguir accediendo
+export const desvincularGoogle=async()=>{
+    try{
+        const token=await AsyncStorage.getItem('token');
+        const response=await fetch(`${BASE_URL}/auth/desvincular_google`,{
+            method:'DELETE',
+            headers:{
+                'Authorization':`Bearer ${token}`
+            }
+        });
+        const data=await response.json();
+        if(!response.ok){
+            throw new Error(data.message || 'Error al desvincular la cuenta de Google');
+        }
+        return data;
+    }catch(error){
+        throw error;
+    }
+}
 //------------Gamificaciones----------------//
 
 //Vamos a implemenatr las gamificaciones,que es una de las carcacteriisticas más importantes de la app

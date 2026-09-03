@@ -7,10 +7,11 @@ import TextInputComponent from '../components/TextInput';
 import {useNavigation} from '@react-navigation/native';
 
 
-import {loginUser} from '../services/services';
+import {loginUser,googleAuth} from '../services/services';
 import ErrorMsg from '../components/ErrorMsg';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, shadow } from '../theme';
+import useGoogleAuth from '../hooks/useGoogleAuth';
 
 const Login=()=>{
     const navigation=useNavigation();
@@ -20,6 +21,7 @@ const Login=()=>{
        const [password,setPassword]=useState('');
        const [message,setMessage]=useState('');
        const [loading,setLoading]=useState(false);
+       const [googleLoading,setGoogleLoading]=useState(false);
        const handleLogin=async()=>{
            if(!email || !password){
                 setMessage('Por favor,complete todos los campos');
@@ -36,6 +38,23 @@ const Login=()=>{
                 //Comprobamos que el email y la contraseña sean correctos
             }
        }
+       const handleGoogleIdToken=async(idToken,error)=>{
+           if(error || !idToken){
+                setMessage('No se ha podido iniciar sesión con Google');
+                return;
+           }
+           try{
+                setGoogleLoading(true);
+                await googleAuth(idToken);
+                setMessage('');
+                navigation.navigate('home');
+           }catch(error){
+                setMessage(`Error al iniciar sesión con Google: ${error.message}`);
+           }finally{
+                setGoogleLoading(false);
+           }
+       }
+       const {request:googleRequest,promptAsync:promptGoogleAsync}=useGoogleAuth(handleGoogleIdToken);
        useEffect(()=>{
         setLoading(true);
         setTimeout(()=>{
@@ -66,6 +85,7 @@ const Login=()=>{
                     <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" iconName="mail-outline"/>
                     <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
                     <Button title="Iniciar Sesión" onPress={handleLogin}/>
+                    <Button title="Continuar con Google" variant="secondary" disabled={!googleRequest || googleLoading} onPress={()=>promptGoogleAsync()}/>
                     <Text style={styles.Mensajes}>¿No tienes una cuenta? <Text style={styles.MensajeStyle} onPress={()=>navigation.navigate('register')}>Regístrate</Text></Text>
                     {message ? <ErrorMsg message={message}/> : null}
                 </View>

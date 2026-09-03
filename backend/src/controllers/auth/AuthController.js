@@ -2,6 +2,7 @@
 const prisma=require('../../db/db');//Traemos la base de datos,que tenemos definiada en el archivo
 const bcrypt=require('bcrypt');//Traemos bcrypt,que es una librería para encriptar las contraseñas
 const generarToken=require('../../utils/jwt');//Traemos la función de generar token,que tenemos definida en el archivo jwt.js,que es donde vamos a definir el jwt,que es el token que se va a generar
+const verificarTokenGoogle=require('../../utils/googleAuth');//Traemos la función que verifica el idToken de Google contra los servidores de Google
 const registro=async(req,res)=>{
     //Vamos a recibir el nombre de usuario,el correo electrónico y la contrasela desde la cuenta cliente
      const {name,email,password}=req.body;
@@ -79,6 +80,10 @@ const login=async(req,res)=>{
             return res.status(404).json({message:'Usuario no encontrado'});
             //Indicamos que el usuario no fue encontrado,si el email no existe en la base de datos
         }
+        if(!user.contrasena){
+            //Si el usuario se registró con Google,no tendrá una contraseña,por lo tanto no puede iniciar sesión con este método
+            return res.status(400).json({message:'Esta cuenta se registró con Google,por favor inicia sesión con Google'});
+        }
         const validPassword=await bcrypt.compare(password,user.contrasena);//Comparamos la contraseña ingresada con la contraseña encriptada en la base de datos
         if(!validPassword){
             return res.status(401).json({message:'Contraseña incorrecta'});
@@ -92,4 +97,97 @@ const login=async(req,res)=>{
         res.status(500).json({message:'Error al iniciar sesión',error:error.message});
     }
 }
-module.exports={registro,login};//Exportamos la función de registro,para poder usarla en el archivo UsuariosRoutes.js,que es donde vamos a definir las rutas de registro de usuarios
+
+//Con esta función el usuario puede registrarse o iniciar sesión con Google,todo en una sola petición
+const googleAuth=async(req,res)=>{
+    //Recibimos el idToken que genera Google en el frontend,una vez que el usuario ha elegido su cuenta de Google
+    const {idToken}=req.body;
+    try{
+        if(!idToken){
+            return res.status(400).json({message:'Por favor,proporcione el token de Google'});
+        }
+        const payload=await verificarTokenGoogle(idToken);//Verificamos el token contra los servidores de Google
+        const {sub:googleId,email,name,picture}=payload;//El campo "sub" es el identificador único e inmutable de la cuenta de Google
+        if(!email){
+            return res.status(400).json({message:'La cuenta de Google no tiene un correo electrónico asociado'});
+        }
+        //Primero comprobamos si ya existe un usuario vinculado a este id de Google
+        let user=await prisma.usuarios.findUnique({where:{google_id:googleId}});
+        if(!user){
+            //Si no hay ningún usuario vinculado,comprobamos si ya existe una cuenta registrada con ese mismo email,para vincularla automáticamente
+            const usuarioExistente=await prisma.usuarios.findUnique({where:{email:email}});
+            if(usuarioExistente){
+                user=await prisma.usuarios.update({
+                    where:{id_usuario:usuarioExistente.id_usuario},
+                    data:{google_id:googleId}
+                });
+            }else{
+                //Si no existe ninguna cuenta con ese email,creamos un usuario nuevo,sin contraseña,ya que se autentica solo con Google
+                user=await prisma.usuarios.create({
+                    data:{
+                        nombre:name || email.split('@')[0],
+                        email:email,
+                        contrasena:null,
+                        google_id:googleId,
+                        rol:'user',
+                        perfil:picture || 'https://images.unsplash.com/vector-1767626090408-a23fae603963?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        gamificaciones:{
+                            create:{racha_dias:0,puntos_ranking:0}
+                        }
+                    }
+                });
+            }
+        }
+        const token=generarToken(user.id_usuario,user.email,user.rol);
+        res.status(200).json({message:'Inicio de sesión con Google exitoso',token});
+    }catch(error){
+        res.status(401).json({message:'Error al iniciar sesión con Google',error:error.message});
+    }
+}
+
+//Con esta función un usuario que ya tiene la sesión iniciada (con email y contraseña) puede vincular su cuenta a Google
+const vincularGoogle=async(req,res)=>{
+    const {idToken}=req.body;
+    try{
+        if(!idToken){
+            return res.status(400).json({message:'Por favor,proporcione el token de Google'});
+        }
+        const payload=await verificarTokenGoogle(idToken);
+        const googleId=payload.sub;
+        const cuentaVinculada=await prisma.usuarios.findUnique({where:{google_id:googleId}});
+        if(cuentaVinculada && cuentaVinculada.id_usuario!==req.user.id){
+            //Esta cuenta de Google ya pertenece a otro usuario de la plataforma,por lo tanto no se puede vincular de nuevo
+            return res.status(400).json({message:'Esta cuenta de Google ya está vinculada a otro usuario'});
+        }
+        const user=await prisma.usuarios.update({
+            where:{id_usuario:req.user.id},
+            data:{google_id:googleId},
+            select:{id_usuario:true,nombre:true,email:true,rol:true,perfil:true,google_id:true}
+        });
+        res.status(200).json({message:'Cuenta de Google vinculada exitosamente',user});
+    }catch(error){
+        res.status(401).json({message:'Error al vincular la cuenta de Google',error:error.message});
+    }
+}
+
+//Con esta función el usuario puede desvincular su cuenta de Google,siempre que tenga una contraseña con la que poder seguir accediendo
+const desvincularGoogle=async(req,res)=>{
+    try{
+        const usuarioActual=await prisma.usuarios.findUnique({where:{id_usuario:req.user.id}});
+        if(!usuarioActual){
+            return res.status(404).json({message:'Usuario no encontrado'});
+        }
+        if(!usuarioActual.contrasena){
+            return res.status(400).json({message:'No puedes desvincular tu cuenta de Google porque no tienes una contraseña establecida. Actualiza tu perfil y crea una contraseña antes de desvincularla'});
+        }
+        const user=await prisma.usuarios.update({
+            where:{id_usuario:req.user.id},
+            data:{google_id:null},
+            select:{id_usuario:true,nombre:true,email:true,rol:true,perfil:true,google_id:true}
+        });
+        res.status(200).json({message:'Cuenta de Google desvinculada exitosamente',user});
+    }catch(error){
+        res.status(500).json({message:'Error al desvincular la cuenta de Google',error:error.message});
+    }
+}
+module.exports={registro,login,googleAuth,vincularGoogle,desvincularGoogle};//Exportamos las funciones de registro,login y las de Google,para poder usarlas en el archivo UsuariosRoutes.js,que es donde vamos a definir las rutas de registro de usuarios
