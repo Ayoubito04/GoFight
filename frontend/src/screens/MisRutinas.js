@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TextInput, FlatList, TouchableOpacity, Modal, Alert } from "react-native";
+import { Text, View, StyleSheet, TextInput, FlatList, TouchableOpacity, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,6 +7,9 @@ import { getRutinas, getUserProfile, getCatalogoEjercicios, crearRutina,Eliminar
 import Button from "../components/Button.js";
 import Footer from "../components/Footer.js";
 import { COLORS, RADIUS, SPACING, difficultyColor, shadow } from "../theme";
+import ErrorMsg from "../components/ErrorMsg.js";
+import ConfirmDialog from "../components/ConfirmDialog.js";
+import { useToast } from "../components/Toast.js";
 
 const MisRutinas = () => {
     const [rutinas, setRutinas] = useState([]);
@@ -14,8 +17,13 @@ const MisRutinas = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [ejercicios, setEjercicios] = useState([]);
     const [ejerciciosSeleccionados, setEjerciciosSeleccionados] = useState([]);
-    
+    //Los errores del formulario se muestran dentro del propio modal,porque un aviso flotante quedaría tapado por él
+    const [modalError, setModalError] = useState('');
+    //Guardamos el id de la rutina que se quiere eliminar,para enseñar el diálogo de confirmación
+    const [rutinaAEliminar, setRutinaAEliminar] = useState(null);
+
     const navigation = useNavigation();
+    const showToast = useToast();
 
     const cargarDatos = async () => {
         try {
@@ -32,6 +40,7 @@ const MisRutinas = () => {
             setEjercicios(ejerciciosData || []);
         } catch (error) {
             console.error("Error cargando datos:", error);
+            showToast('No se han podido cargar tus rutinas', 'error');
         }
     };
 
@@ -44,18 +53,28 @@ const MisRutinas = () => {
 
         if (yaSeleccionado) {
             setEjerciciosSeleccionados(ejerciciosSeleccionados.filter(eId => eId !== id));
+            setModalError('');
         } else {
             if (ejerciciosSeleccionados.length < 6) {
                 setEjerciciosSeleccionados([...ejerciciosSeleccionados, id]);
+                setModalError('');
             } else {
-                Alert.alert("Límite alcanzado", "Solo puedes añadir un máximo de 6 ejercicios.");
+                setModalError('Solo puedes añadir un máximo de 6 ejercicios.');
             }
         }
     };
 
+    //Al cerrar el modal dejamos el formulario limpio,para que la próxima vez se abra en blanco
+    const cerrarModal = () => {
+        setModalVisible(false);
+        setNombreRutina('');
+        setEjerciciosSeleccionados([]);
+        setModalError('');
+    };
+
     const handleGuardarRutina = async () => {
         if (!nombre_rutina.trim() || ejerciciosSeleccionados.length === 0) {
-            Alert.alert("Error", "Completa el nombre y selecciona ejercicios.");
+            setModalError('Completa el nombre y selecciona al menos un ejercicio.');
             console.log("Validación fallida: nombre_rutina:", nombre_rutina, "ejerciciosSeleccionados:", ejerciciosSeleccionados);
             return;
         }
@@ -64,42 +83,32 @@ const MisRutinas = () => {
             const resultado = await crearRutina(nombre_rutina, ejerciciosSeleccionados);
 
             if (resultado) {
-                await cargarDatos(); 
-                setModalVisible(false);
-                setNombreRutina('');
-                setEjerciciosSeleccionados([]);
-                Alert.alert("Éxito", "Rutina guardada correctamente");
+                await cargarDatos();
+                cerrarModal();
+                showToast('Rutina guardada correctamente', 'success');
             }
         } catch (error) {
             console.error("Error al guardar:", error);
-            Alert.alert("Error", "No se pudo guardar la rutina en el servidor.");
+            setModalError('No se ha podido guardar la rutina en el servidor.');
         }
     };
+    //Antes de borrar pedimos confirmación con el diálogo propio de la app,para evitar eliminaciones accidentales
     const handleEliminarRutina =(id)=>{
-        Alert.alert(
-            "Confirmar eliminación",
-            "¿Estás seguro de que deseas eliminar esta rutina?",
-            [
-                { text: "Cancelar", style: "cancel" },
-                { text: "Eliminar", style: "destructive", onPress: () => eliminarRutina(id) }
-            ]
-            //
-            //Aquí se muestra una alerta para confirmar la aelimoinación de la rutina,para evitar eliminaciones accidentales,si el usuario confirma la eliminación,se llama a la función eliminarRutina con el id de la rutina a eliminar
-        )
+        setRutinaAEliminar(id);
     };
-    const eliminarRutina=async(id)=>{
+    const confirmarEliminarRutina=async()=>{
+        const id=rutinaAEliminar;
+        setRutinaAEliminar(null);
         try{
             const eliminarResultado=await EliminarRutina(id);
             if(eliminarResultado){
                 await cargarDatos();
-                Alert.alert("Éxito","Rutina eliminada correctamente");
+                showToast('Rutina eliminada','success');
             }
         }catch(error){
             console.error("Error al eliminar:",error);
-            Alert.alert("Error","No se pudo eliminar la rutina en el servidor.");
-
-    }
-
+            showToast('No se ha podido eliminar la rutina','error');
+        }
     }
 
     return (
@@ -142,8 +151,10 @@ const MisRutinas = () => {
                             }}
                         />
 
+                        {modalError ? <ErrorMsg message={modalError}/> : null}
+
                         <View style={styles.buttonRow}>
-                            <TouchableOpacity style={styles.btnSecundario} onPress={() => setModalVisible(false)}>
+                            <TouchableOpacity style={styles.btnSecundario} onPress={cerrarModal}>
                                 <Text style={styles.btnSecundarioText}>Cancelar</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.btnPrimario} onPress={handleGuardarRutina}>
@@ -153,6 +164,17 @@ const MisRutinas = () => {
                     </View>
                 </View>
             </Modal>
+
+            <ConfirmDialog
+                visible={rutinaAEliminar !== null}
+                title="Eliminar rutina"
+                message="Esta acción no se puede deshacer. ¿Seguro que quieres eliminarla?"
+                confirmText="Eliminar"
+                icon="trash"
+                destructive
+                onConfirm={confirmarEliminarRutina}
+                onCancel={() => setRutinaAEliminar(null)}
+            />
 
             <View style={styles.container}>
                 <Text style={styles.title}>MIS RUTINAS</Text>
@@ -180,7 +202,7 @@ const MisRutinas = () => {
                     }}
                 />
 
-                <Button title="CREAR NUEVA RUTINA" onPress={() => setModalVisible(true)} />
+                <Button title="CREAR NUEVA RUTINA" onPress={() => { setModalError(''); setModalVisible(true); }} />
             </View>
 
             <Footer />

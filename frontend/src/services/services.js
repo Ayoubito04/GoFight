@@ -39,8 +39,7 @@ export const registerUser=async(name,email,password,perfil)=>{
             //Esto guardará el token de autenticación en el almacenamiento local del dispositivo
                await AsyncStorage.setItem('token',data.token);
                console.log('Token guardado en AsyncStorage:',data.token);
-            alert('Usuario registrado exitosamente');
-            //Nos dará una alerta de que el usuario se ha registrado correctamente,si todo
+            //El aviso de "registrado correctamente" lo muestra la pantalla con el toast de la app,aquí solo guardamos el token
          }
      }catch(error){
        throw error;
@@ -71,8 +70,7 @@ export const loginUser=async(email,password)=>{
          }
          else{
             await AsyncStorage.setItem('token',data.token);
-            alert('Inicio de sesión exitoso');
-            //Esta alerta nos avisara de que el usuario sha iniciado sesión correctamente,si todo ha ido bien
+            //El aviso de "sesión iniciada" lo muestra la pantalla con el toast de la app,aquí solo guardamos el token
 
          }
 
@@ -108,8 +106,9 @@ export const getUserProfile=async()=>{
              //Si la respuesta es ok,entonces devolvemos los datos del perfil del usuario,que nos devuelve la API
          }
      }catch(error){
-         alert(`Error al obtener el perfil del usuario: ${error.message}`);
          console.error('Error al obtener el perfil del usuario',error);
+         //Propagamos el error para que sea la pantalla la que decida qué avisar al usuario,con el toast de la app
+         throw error;
      }
 }
 //Con esta función el usuario se registra o inicia sesión con Google,todo en una sola petición,mandando el idToken que genera Google en el dispositivo

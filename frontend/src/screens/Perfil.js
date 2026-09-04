@@ -18,7 +18,10 @@ import { Modal } from 'react-native';
 import TextInput from '../components/TextInput';
 import { COLORS } from '../theme';
 import useGoogleAuth from '../hooks/useGoogleAuth';
+import GoogleLogo from '../components/GoogleLogo';
+import { useToast } from '../components/Toast';
 const Perfil = ({ navigation }) => {
+    const showToast = useToast();
     const [loading, setLoading] = useState(true);
     const [perfil, setPerfil] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
@@ -38,6 +41,7 @@ const Perfil = ({ navigation }) => {
             setGamificaciones(gamData);
         } catch (error) {
             console.error('Error al obtener los datos del perfil:', error);
+            showToast('No se han podido cargar tus datos', 'error');
         } finally {
             setLoading(false);
         }
@@ -49,30 +53,45 @@ const Perfil = ({ navigation }) => {
 
     const handleGoogleIdToken = async (idToken, error) => {
         if (error || !idToken) {
-            alert('No se ha podido vincular la cuenta de Google');
+            showToast('No se ha podido vincular la cuenta de Google', 'error');
+            setGoogleActionLoading(false);
             return;
         }
         try {
             setGoogleActionLoading(true);
             await vincularGoogle(idToken);
-            alert('Cuenta de Google vinculada exitosamente');
+            showToast('Cuenta de Google vinculada', 'success');
             await fetchData();
         } catch (error) {
-            alert(`Error al vincular la cuenta de Google: ${error.message}`);
+            showToast(`No se ha podido vincular: ${error.message}`, 'error');
         } finally {
             setGoogleActionLoading(false);
         }
     };
     const { request: googleRequest, promptAsync: promptGoogleAsync } = useGoogleAuth(handleGoogleIdToken);
 
+    //Activamos la rueda nada más pulsar,y la apagamos si el usuario cierra la ventana de Google sin llegar a identificarse
+    const handleGooglePress = async () => {
+        try {
+            setGoogleActionLoading(true);
+            const result = await promptGoogleAsync();
+            if (result?.type !== 'success') {
+                setGoogleActionLoading(false);
+            }
+        } catch (error) {
+            showToast('No se ha podido abrir la vinculación con Google', 'error');
+            setGoogleActionLoading(false);
+        }
+    };
+
     const handleUnlinkGoogle = async () => {
         try {
             setGoogleActionLoading(true);
             await desvincularGoogle();
-            alert('Cuenta de Google desvinculada exitosamente');
+            showToast('Cuenta de Google desvinculada', 'success');
             await fetchData();
         } catch (error) {
-            alert(`Error al desvincular la cuenta de Google: ${error.message}`);
+            showToast(`No se ha podido desvincular: ${error.message}`, 'error');
         } finally {
             setGoogleActionLoading(false);
         }
@@ -95,15 +114,14 @@ const Perfil = ({ navigation }) => {
             emailFinal,
             newPassword.trim()!== '' ? newPassword : undefined
            )
-           alert('Perfil actualizado exitosamente');
+           showToast('Perfil actualizado', 'success');
           console.log('Datos a actualizar:', { nombreFinal, emailFinal, newPassword });
           //El usuario puede actualizar su nombre,email y contraseña,si no quiere actualizar alguno de esos campos,puede dejarlo vacío y se mantendrá el valor actual,ya que en el servicio de actualizarPerfil,si el campo está vacío,se mantiene el valor actual,lo cual es una ventaja para el usuario,ya que no tiene que llenar todos los campos si solo quiere actualizar uno o dos campos
 
           // Aquí podrías mostrar un mensaje de éxito al usuario
       } catch (error) {
           console.error('Error al actualizar el perfil:', error);
-          //En caso de error, podrías mostrar un mensaje de error al usuario
-          // Aquí podrías mostrar un mensaje de error al usuario
+          showToast('No se ha podido actualizar el perfil', 'error');
       } finally {
           setModalVisible(false);
           setNewNombre('');
@@ -207,7 +225,7 @@ const Perfil = ({ navigation }) => {
                 <View style={styles.Section}>
                     <Text style={styles.SectionTitle}>Cuenta de Google</Text>
                     <View style={styles.InfoRow}>
-                        <Ionicons name="logo-google" size={20} color={COLORS.primary} />
+                        <GoogleLogo size={19} />
                         <Text style={styles.InfoLabel}>Estado</Text>
                         <Text style={styles.InfoValue}>{googleVinculado ? 'Vinculada' : 'No vinculada'}</Text>
                     </View>
@@ -215,16 +233,20 @@ const Perfil = ({ navigation }) => {
                         {googleVinculado ? (
                             <Button
                                 title="Desvincular de Google"
+                                loadingTitle="Desvinculando..."
                                 variant="secondary"
-                                disabled={googleActionLoading}
+                                loading={googleActionLoading}
                                 onPress={handleUnlinkGoogle}
                             />
                         ) : (
                             <Button
                                 title="Vincular con Google"
-                                variant="secondary"
-                                disabled={!googleRequest || googleActionLoading}
-                                onPress={() => promptGoogleAsync()}
+                                loadingTitle="Conectando con Google..."
+                                variant="google"
+                                icon={<GoogleLogo size={19} />}
+                                loading={googleActionLoading}
+                                disabled={!googleRequest}
+                                onPress={handleGooglePress}
                             />
                         )}
                     </View>

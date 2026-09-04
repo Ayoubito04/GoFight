@@ -1,6 +1,6 @@
 //Vamos a traer los ejercicios de la rutina,cuando el usuario le de a una de las rutinas,podrá ver los ejercicios que contiene esa rutina
 import React, { useEffect,useRef,useState } from "react";
-import {View,Text,StyleSheet,SafeAreaView,ActivityIndicator,ScrollView,Platform,StatusBar, TouchableOpacity, Alert} from 'react-native';
+import {View,Text,StyleSheet,SafeAreaView,ActivityIndicator,ScrollView,Platform,StatusBar, TouchableOpacity} from 'react-native';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import Footer from "../components/Footer";
@@ -9,12 +9,14 @@ import Button from "../components/Button";
 import EjercicioCard from "../components/EjercicioCard";
 import { registrarSesionHistorial } from "../services/services";
 import { COLORS, SPACING, RADIUS, shadow } from "../theme";
+import { useToast } from "../components/Toast";
 
 
 
 
 const Ejercicios=({route})=>{
          const navigation=useNavigation();
+         const showToast=useToast();
          const { rutinaId } = route.params;
          const [ejercicios,setEjercicios]=useState([]);//Definimos el edstado de los ehercicios dentro de una array vacia
 
@@ -98,7 +100,7 @@ const Ejercicios=({route})=>{
                                 <Ionicons name="arrow-back" size={20} color={COLORS.textPrimary}/>
                         </TouchableOpacity>
                         <Text style={styles.topBarTitle}>Ejercicios</Text>
-                        <TouchableOpacity style={styles.topBarButton} onPress={()=>Alert.alert('Opciones','Próximamente')} hitSlop={10}>
+                        <TouchableOpacity style={styles.topBarButton} onPress={()=>showToast('Más opciones muy pronto','info')} hitSlop={10}>
                                 <Ionicons name="ellipsis-vertical" size={20} color={COLORS.textPrimary}/>
                         </TouchableOpacity>
                 </View>

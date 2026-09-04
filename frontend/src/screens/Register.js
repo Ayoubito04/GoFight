@@ -11,6 +11,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ErrorMsg from '../components/ErrorMsg';
 import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 import useGoogleAuth from '../hooks/useGoogleAuth';
+import GoogleLogo from '../components/GoogleLogo';
+import { useToast } from '../components/Toast';
 
 
 
@@ -26,17 +28,21 @@ export default function Register({}){
             const [message,setMessage]=useState('');
             const [laoding,setLoading]=useState(false);
             const [googleLoading,setGoogleLoading]=useState(false);
+            //Estado propio del botón de registrar,para mostrar la rueda dentro del botón mientras se crea la cuenta
+            const [submitting,setSubmitting]=useState(false);
             const navigation=useNavigation();
+            const showToast=useToast();
             const handleGoogleIdToken=async(idToken,error)=>{
                 if(error || !idToken){
                      setMessage('No se ha podido registrar con Google');
+                     setGoogleLoading(false);
                      return;
                 }
                 try{
                      setGoogleLoading(true);
                      await googleAuth(idToken);
                      setMessage('');
-                     alert('Registro con Google exitoso');
+                     showToast('¡Bienvenido a GoFight!','success');
                      navigation.navigate('home');
                 }catch(error){
                      setMessage(`Error al registrar con Google: ${error.message}`);
@@ -45,6 +51,19 @@ export default function Register({}){
                 }
             }
             const {request:googleRequest,promptAsync:promptGoogleAsync}=useGoogleAuth(handleGoogleIdToken);
+            //Activamos la rueda nada más pulsar,y la apagamos si el usuario cierra la ventana de Google sin llegar a identificarse
+            const handleGooglePress=async()=>{
+                try{
+                     setGoogleLoading(true);
+                     const result=await promptGoogleAsync();
+                     if(result?.type!=='success'){
+                          setGoogleLoading(false);
+                     }
+                }catch(error){
+                     setMessage('No se ha podido abrir el registro con Google');
+                     setGoogleLoading(false);
+                }
+            }
 
             //Tenemos los hooks necesarios para manejar el esatdo de los campos formularios
            //Antes de empezar con la lógica de los hooks,vamos a poner una pantalla de carga
@@ -81,20 +100,22 @@ export default function Register({}){
                    return;
               }
                try{
-                 
+                    setSubmitting(true);
                     await registerUser(nombre,email,password,'user');
                     setNombre('');
-                    
+
                     setEmail('');
                     setPassword('');
                     setConfirmPassword('');
                     setMessage('');
-                      alert('Registro exitoso,ahora puedes iniciar sesión');
+                      showToast('Cuenta creada correctamente','success');
                       navigation.navigate('home');
-                      
-              
+
+
                }catch(error){
                     setMessage(`Error al registrar el usuario: ${error.message}`);
+               }finally{
+                    setSubmitting(false);
                }
 
           }
@@ -125,8 +146,21 @@ export default function Register({}){
                         <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" iconName="mail-outline"/>
                         <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
                         <TextInputComponent placeholder="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry iconName="lock-closed-outline"/>
-                        <Button title="Registrar" onPress={handleClick}/>
-                        <Button title="Continuar con Google" variant="secondary" disabled={!googleRequest || googleLoading} onPress={()=>promptGoogleAsync()}/>
+                        <Button title="Registrar" loadingTitle="Creando cuenta..." loading={submitting} disabled={googleLoading} onPress={handleClick}/>
+                        <View style={styles.DividerRow}>
+                            <View style={styles.DividerLine}/>
+                            <Text style={styles.DividerText}>o regístrate con</Text>
+                            <View style={styles.DividerLine}/>
+                        </View>
+                        <Button
+                            title="Continuar con Google"
+                            loadingTitle="Conectando con Google..."
+                            variant="google"
+                            icon={<GoogleLogo size={19}/>}
+                            loading={googleLoading}
+                            disabled={!googleRequest || submitting}
+                            onPress={handleGooglePress}
+                        />
                         <TouchableOpacity onPress={handleToLogin}>
                             <Text style={styles.LinkStyle}>¿Ya tienes una cuenta? <Text style={styles.IniciarSesionText}>Iniciar sesión</Text></Text>
                         </TouchableOpacity>
@@ -206,6 +240,7 @@ const styles=StyleSheet.create({
       },
       FormStyle:{
         width:'100%',
+        gap:SPACING.sm,
         padding:SPACING.xl,
         borderRadius:RADIUS.xl,
         backgroundColor:COLORS.surface,
@@ -218,6 +253,25 @@ const styles=StyleSheet.create({
         fontSize:13,
         lineHeight:19,
         marginBottom:SPACING.md,
+      },
+      //Separador entre el registro con email y el registro con Google
+      DividerRow:{
+        flexDirection:'row',
+        alignItems:'center',
+        gap:SPACING.md,
+        marginVertical:SPACING.xs,
+      },
+      DividerLine:{
+        flex:1,
+        height:1,
+        backgroundColor:COLORS.border,
+      },
+      DividerText:{
+        color:COLORS.textMuted,
+        fontSize:11,
+        fontWeight:'700',
+        letterSpacing:0.6,
+        textTransform:'uppercase',
       },
       Mensajes:{
         color:COLORS.danger,

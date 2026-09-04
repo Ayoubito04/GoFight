@@ -1,16 +1,18 @@
 //Vamos a definir el header de la aplicación,que va a ser un componente esencial para casí todas las paginas
 import React from 'react';
-import {View,Text,StyleSheet,SafeAreaView, Platform, StatusBar, TouchableOpacity, Alert, Image} from 'react-native';
+import {View,Text,StyleSheet,SafeAreaView, Platform, StatusBar, TouchableOpacity, Image} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import { getUserProfile } from '../services/services';
 import { useEffect, useState } from 'react';
 import { COLORS, SPACING } from '../theme';
 import SideMenu from './SideMenu';
+import { useToast } from './Toast';
 
 
 const Header=()=>{
      const [userProfile,setUserProfile]=useState(null);
      const [menuVisible,setMenuVisible]=useState(false);
+     const showToast=useToast();
       useEffect(()=>{
         //Aquí vamos a definir la lógica para obtener el perfil del usuario
         const fetchUserProfile=async()=>{
@@ -49,7 +51,7 @@ const Header=()=>{
                               <Text style={style.Subtitle}>Listo para superar tus objetivos hoy</Text>
                         </View>
 
-                        <TouchableOpacity style={style.IconButton} onPress={()=>Alert.alert('Notificaciones','No tienes notificaciones nuevas')} hitSlop={10}>
+                        <TouchableOpacity style={style.IconButton} onPress={()=>showToast('No tienes notificaciones nuevas','info')} hitSlop={10}>
                               <Ionicons name='notifications-outline' size={22} color={COLORS.textPrimary}/>
                               <View style={style.NotificationDot}/>
                         </TouchableOpacity>

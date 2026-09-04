@@ -1,13 +1,12 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "GoFight",
     "slug": "frontend",
     "version": "1.0.0",
     "scheme": "gofight",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "gofight",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -30,6 +29,12 @@
     },
     "plugins": [
       "expo-web-browser"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "37016f49-a6c1-49c8-8b0b-91c21f1b8245"
+      }
+    },
+    "owner": "ayoubito04"
   }
 }

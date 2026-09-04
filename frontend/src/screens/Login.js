@@ -12,9 +12,12 @@ import ErrorMsg from '../components/ErrorMsg';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, shadow } from '../theme';
 import useGoogleAuth from '../hooks/useGoogleAuth';
+import GoogleLogo from '../components/GoogleLogo';
+import { useToast } from '../components/Toast';
 
 const Login=()=>{
     const navigation=useNavigation();
+    const showToast=useToast();
     //Vamos a implemtar el login,que va a ser una pantalla muy sencilla
 
       const [email,setEmail]=useState('');
@@ -22,31 +25,39 @@ const Login=()=>{
        const [message,setMessage]=useState('');
        const [loading,setLoading]=useState(false);
        const [googleLoading,setGoogleLoading]=useState(false);
+       //Estado propio del botón de iniciar sesión,para mostrar la rueda dentro del botón mientras se comprueban las credenciales
+       const [submitting,setSubmitting]=useState(false);
        const handleLogin=async()=>{
            if(!email || !password){
                 setMessage('Por favor,complete todos los campos');
                 return;
            }
             try{
+               setSubmitting(true);
                await loginUser(email,password);
                 setEmail('');
                 setPassword('');
                 setMessage('');
+                showToast('Sesión iniciada','success');
                 navigation.navigate('home');
             }catch(error){
                 setMessage('Error al iniciar sesión,compruebe que el email y la contraseña sean correctos');
                 //Comprobamos que el email y la contraseña sean correctos
+            }finally{
+                setSubmitting(false);
             }
        }
        const handleGoogleIdToken=async(idToken,error)=>{
            if(error || !idToken){
                 setMessage('No se ha podido iniciar sesión con Google');
+                setGoogleLoading(false);
                 return;
            }
            try{
                 setGoogleLoading(true);
                 await googleAuth(idToken);
                 setMessage('');
+                showToast('Sesión iniciada con Google','success');
                 navigation.navigate('home');
            }catch(error){
                 setMessage(`Error al iniciar sesión con Google: ${error.message}`);
@@ -55,6 +66,19 @@ const Login=()=>{
            }
        }
        const {request:googleRequest,promptAsync:promptGoogleAsync}=useGoogleAuth(handleGoogleIdToken);
+       //Activamos la rueda nada más pulsar,y la apagamos si el usuario cierra la ventana de Google sin llegar a identificarse
+       const handleGooglePress=async()=>{
+            try{
+                setGoogleLoading(true);
+                const result=await promptGoogleAsync();
+                if(result?.type!=='success'){
+                     setGoogleLoading(false);
+                }
+            }catch(error){
+                setMessage('No se ha podido abrir el inicio de sesión con Google');
+                setGoogleLoading(false);
+            }
+       }
        useEffect(()=>{
         setLoading(true);
         setTimeout(()=>{
@@ -91,8 +115,21 @@ const Login=()=>{
                      <Text style={styles.FormSubtitle}>Accede para continuar con tu entrenamiento.</Text>
                     <TextInputComponent placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" iconName="mail-outline"/>
                     <TextInputComponent placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry iconName="lock-closed-outline"/>
-                    <Button title="Iniciar Sesión" onPress={handleLogin}/>
-                    <Button title="Continuar con Google" variant="secondary" disabled={!googleRequest || googleLoading} onPress={()=>promptGoogleAsync()}/>
+                    <Button title="Iniciar Sesión" loadingTitle="Iniciando sesión..." loading={submitting} disabled={googleLoading} onPress={handleLogin}/>
+                    <View style={styles.DividerRow}>
+                        <View style={styles.DividerLine}/>
+                        <Text style={styles.DividerText}>o continúa con</Text>
+                        <View style={styles.DividerLine}/>
+                    </View>
+                    <Button
+                        title="Continuar con Google"
+                        loadingTitle="Conectando con Google..."
+                        variant="google"
+                        icon={<GoogleLogo size={19}/>}
+                        loading={googleLoading}
+                        disabled={!googleRequest || submitting}
+                        onPress={handleGooglePress}
+                    />
                     <Text style={styles.Mensajes}>¿Aún no tienes cuenta? <Text style={styles.MensajeStyle} onPress={()=>navigation.navigate('register')}>Crear cuenta</Text></Text>
                     {message ? <ErrorMsg message={message}/> : null}
                 </View>
@@ -169,6 +206,25 @@ const styles=StyleSheet.create({
             fontSize:13,
             lineHeight:19,
             marginBottom:SPACING.md,
+        },
+        //Separador entre el acceso con email y el acceso con Google
+        DividerRow:{
+            flexDirection:'row',
+            alignItems:'center',
+            gap:SPACING.md,
+            marginVertical:SPACING.xs,
+        },
+        DividerLine:{
+            flex:1,
+            height:1,
+            backgroundColor:COLORS.border,
+        },
+        DividerText:{
+            color:COLORS.textMuted,
+            fontSize:11,
+            fontWeight:'700',
+            letterSpacing:0.6,
+            textTransform:'uppercase',
         },
         Mensajes:{
             color:COLORS.textSecondary,
